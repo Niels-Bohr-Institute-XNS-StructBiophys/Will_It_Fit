@@ -1,0 +1,33 @@
+6               Sample information for nanodiscs with tags. The values corresponds to MSP1D1-nanodiscs with DLPC.
+
+The molecular volumes
+30.0            Molecular volume of solvent
+319.0           Molecular volume of a lipid headgroup
+557.4           Molecular volume of lipid CH2-groups
+108.6           Molecular volume of lipid CH3-groups
+27146.4         Molecular volume of a belt protein
+3143.3          Molecular volume of a his tag
+
+The neutron scattering lengths in 100% D2O
+1.9145E-12      Scattering length of solvent
+7.05E-12        Scattering length of a lipid headgroup
+-1.67E-12       Scattering length of lipid CH2-groups
+-9.15E-13       Scattering length of lipid CH3-groups
+8.27E-10        Scattering length of a belt protein
+9.58E-11        Scattering length of a his tag
+
+The neutron scattering lengths in 100% H2O
+-1.678E-13      Scattering length of solvent
+7.05E-12        Scattering length of a lipid headgroup
+-1.67E-12       Scattering length of lipid CH2-groups
+-9.15E-13       Scattering length of lipid CH3-group
+6.49E-10        Scattering length of a belt protein
+7.52E-11        Scattering length of a his tag
+
+The X-ray scattering lengths
+2.82E-12        Scattering length of solvent
+4.62E-11        Scattering length of a lipid headgroup
+4.51E-11        Scattering length of lipid CH2-groups
+5.08E-12        Scattering length of lipid CH3-groups
+3.31E-9         Scattering length of a belt protein
+4.02E-10        Scattering length of a his tag

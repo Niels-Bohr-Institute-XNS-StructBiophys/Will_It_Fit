@@ -1,0 +1,29 @@
+5               Sample information file for the polydisperse peptide disc model. The values correspond to DMPC-lipids and 18A-peptides.
+
+The molecular volumes
+30.0            Molecular volume of solvent
+319.0           Molecular volume of a lipid headgroup
+682.4           Molecular volume of a lipid CH2-groups
+108.6           Molecular volume of a lipid CH3-groups
+2708.8          Molecular volume of a peptide
+
+The neutron scattering lengths in 100% D2O
+1.9145E-12      Scattering length of solvent
+70.5E-13        Scattering length of a lipid headgroup
+-2.00E-12       Scattering length of a lipid CH2-groups
+-0.915E-12      Scattering length of a lipid CH3-groups
+8.29E-11        Scattering length of a peptide
+
+The neutron scattering lengths in 100% H2O
+0.0             Scattering length of solvent
+0.0             Scattering length of a lipid headgroup
+0.0             Scattering length of a lipid CH2-groups
+0.0             Scattering length of a lipid CH3-groups
+0.0             Scattering length of a peptide
+
+The X-ray scattering lengths
+2.82E-12        Scattering length of solvent
+4.62E-11        Scattering length of a lipid headgroup
+5.41E-11        Scattering length of a lipid CH2-groups
+5.08E-12        Scattering length of a lipid CH3-groups
+3.32E-10        Scattering length of a peptide

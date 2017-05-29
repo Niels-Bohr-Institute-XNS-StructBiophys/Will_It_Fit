@@ -1,0 +1,17 @@
+2               This file contains the sample information for the model describing an ensemble of polydisperse spheres
+
+The molecular volumes
+30.0            Molecular volume of solvent
+100.0           Molecular volume of component making up the spheres
+
+The neutron scattering lengths in 100% D2O
+1.9145E-12      Scattering length of solvent
+1.000E-12       Scattering length of component making up the spheres
+
+The neutron scattering lengths in 100% H2O
+-1.678E-13      Scattering length of solvent
+1.000E-12       Scattering length of component making up the spheres
+
+The X-ray scattering lengths
+2.82E-12        Scattering length of solvent
+1.00E-12        Scattering length of component making up the spheres

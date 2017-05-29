@@ -1,0 +1,15 @@
+0.90	1.00	1.10	1	ScaleN100    	
+0.90	1.00	1.10	1	ScaleN0
+0.90	1.00	1.10	1	ScaleX		  
+0.00	0.00	10.00	1	WatersAtHeads		
+0.90	1.00	1.10    1	CVOfHeads
+0.90	1.00	1.10	1	CVOfTails
+0.90	1.00	1.10	1	CVOfWater
+0.00    100.0	200.0	1	AggregationNumber
+-1.00	0.00	1.00    1	BackN100	  	
+-1.00	0.00	1.00	1	BackN0	
+-1.00	0.00	1.00    1	BackX
+0.001	0.20	0.60	1	SigmaAggregationNumber
+0.00	2.00	8.00	1	XRoughness
+0.00	2.00	8.00	1	NRoughness
+0.90	1.00	1.10	1	ScaleConcentration

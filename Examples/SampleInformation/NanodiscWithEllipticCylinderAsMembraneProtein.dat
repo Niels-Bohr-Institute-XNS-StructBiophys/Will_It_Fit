@@ -1,0 +1,33 @@
+6               Sample information file for the model of nanodiscs with transmembrane protein modelled by an elliptic cylidner. The values correspond to POPC-lipids, MSP1D1 as belt protein and bacteriorhodopsin as the membrane protein.
+
+The molecular volumes
+30.0            Molecular volume of solvent
+319.0           Molecular volume of a lipid headgroup
+818.8           Molecular volume of a lipid CH2-groups
+108.6           Molecular volume of a lipid CH3-groups
+27653.3         Molecular volume of a belt protein
+34932.0         Molecular volume of membrane protein
+
+The neutron scattering lengths in 100% D2O
+1.9145E-12      Scattering length of solvent
+70.5E-13        Scattering length of a lipid headgroup
+-17.6E-13       Scattering length of a lipid CH2-groups
+-0.915E-12      Scattering length of a lipid CH3-groups
+8.778E-10       Scattering length of a belt protein
+9.527E-10       Scattering length of membrane protein
+
+The neutron scattering lengths in 100% H2O
+-1.678E-13      Scattering length of solvent
+70.5E-13        Scattering length of a lipid headgroup
+-17.6E-13       Scattering length of a lipid CH2-groups
+-0.915E-12      Scattering length of a lipid CH3-groups
+4.995E-10       Scattering length of a belt protein
+5.810E-10       Scattering length of membrane protein
+
+The X-ray scattering lengths
+2.82E-12        Scattering length of solvent
+4.62E-11        Scattering length of a lipid headgroup
+6.71E-11        Scattering length of a lipid CH2-groups
+5.08E-12        Scattering length of a lipid CH3-groups
+3.31E-9         Scattering length of a belt protein
+4.045E-9        Scattering length of membrane protein

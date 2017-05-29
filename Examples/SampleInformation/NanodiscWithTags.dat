@@ -1,0 +1,33 @@
+6               Sample information for nanodiscs with tags. The values corresponds to ApoA1-nanodiscs with POPC.
+
+The molecular volumes [AA^3]
+30.0            Molecular volume of solvent
+319.0           Molecular volume of a lipid headgroup
+818.8           Molecular volume of a lipid CH2-groups
+108.6           Molecular volume of a lipid CH3-groups
+29078           Molecular volume of a ApoA1 without globular domain
+9177            Molecular volume of a His-TEV tag + ApoA1 globular domain
+
+The neutron scattering lengths in 100% D2O [cm]
+19.145E-13      Scattering length of solvent
+70.5E-13        Scattering length of a lipid headgroup
+-17.6E-13       Scattering length of a lipid CH2-groups
+-0.915E-12      Scattering length of a lipid CH3-groups
+5.283E-10       Scattering length of ApoA1 without globular domain (used BSLDC at psldc.isis.rl.ac.uk)
+1.957E-10       Scattering length of a His-TEV tag + ApoA1 globular domain (used BSLDC @ psldc.isis.rl.ac.uk)
+
+The neutron scattering lengths in 100% H2O [cm]
+-1.678E-13      Scattering length of solvent
+70.5E-13        Scattering length of a lipid headgroup
+-17.6E-13       Scattering length of a lipid CH2-groups
+-0.915E-12      Scattering length of a lipid CH3-groups
+8.856E-10       Scattering length of ApoA1 without globular domain (used BSLDC @ psldc.isis.rl.ac.uk, assumed 90% exchange)
+2.973E-10       Scattering length of a His-TEV tag + ApoA1 globular domain (used BSLDC @ psldc.isis.rl.ac.uk, assumed 90% exchange)
+
+The X-ray scattering lengths [cm]
+2.82E-12        Scattering length of solvent
+4.62E-11        Scattering length of a lipid headgroup
+6.71E-11        Scattering length of a lipid CH2-groups
+5.08E-12        Scattering length of a lipid CH3-groups
+3.51E-9         Scattering length of ApoA1 without globular domain
+11.27E-10       Scattering length of a His-TEV tag + ApoA1 globular domain
