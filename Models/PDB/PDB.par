@@ -1,9 +1,0 @@
-1e-05             1e-05             10                1   XRoughness
-1e-05             1e-05             10                1   NRoughness    
--1                0                 1                 1   BackN100        
-0.9               1                 1.1               1   ScaleN100       
--1                0                 1                 1   BackN0          
-0.9               1                 1.1               1   ScaleN0         
--1                0                 1                 1   BackX           
-0.9               1                 1.1               1   ScaleX              
-0.9               1                 1.1               1   ScaleConc

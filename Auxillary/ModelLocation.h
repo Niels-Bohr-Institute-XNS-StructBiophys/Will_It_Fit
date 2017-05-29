@@ -1,1 +1,1 @@
- 
+#include "/Users/nicholas/Documents/LINX/data_analysis/Novonordisk/fattyacids/ScatteringCalculations/WillItFit-SVN/branches/Protein-With-HetAtms/Models/ProteinWithSemiflexibleChainAndFractalAgg/ModelInfo.h"
