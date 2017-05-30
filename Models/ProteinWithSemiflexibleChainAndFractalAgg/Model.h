@@ -47,25 +47,7 @@ double Model(double q, double * Parameters, double * Constraints, double Contras
     int NL=1000;
     double L = Parameters[ContourLength];
     double b = Parameters[KuhnLength];
-    //AddScatteringFromSemiflexibleTag(Beta,
-    //                     q,
-    //                     Constraints[X],
-    //                     Constraints[Y],
-    //                     Constraints[Z],
-    //                     Constraints[PolymerChainExcessScatteringLenght],
-    //                   NL,
-    //                   L,
-    //                   b);
 
-    //AddScatteringFromSemiflexibleTag(BetaProt,
-    //                                        Q0,
-    //                                        Constraints[X],
-    //                                        Constraints[Y],
-    //                                        Constraints[Z],
-    //                                        Constraints[PolymerChainExcessScatteringLenght],
-    //                                      NL,
-    //                                      L,
-    //                                      b);
 
     // Calculate intensity
     Intensity = 0.0;
@@ -85,11 +67,7 @@ double Model(double q, double * Parameters, double * Constraints, double Contras
 
 
 
-  //Intensity=SemiflexibleChainSelf(NL, q, L,b); //CoilAmp;
-  //Intensity +=  +(pow(Constraints[PolymerChainExcessScatteringLenght],2) *SemiflexibleChainSelf(NL, q, L,b)
-  //              - pow(Constraints[PolymerChainExcessScatteringLenght]*SemiflexibleChainAmp(NL, q, L,b),2));
-  //printf("%0.2e \n", 1.+pow(cabs(SFBeta),2.)/Intensity); // pow(cabs(SFBeta),2)/Intensity, pow(cabs(SFBeta),2));
-    /// Rescale result and return
+   /// Rescale result and return
     if (Contrast >= 0.0 && Contrast <= 100.0) {
         Scaling    = Parameters[SCALECONC] * (Contrast / 100.0 * Parameters[SCALEN100] + (100.0 - Contrast) / 100.0 * Parameters[SCALEN0]);
         Background = Contrast / 100.0 * Parameters[BACKN100] + (100.0 - Contrast) / 100.0 * Parameters[BACKN0];
@@ -103,12 +81,5 @@ double Model(double q, double * Parameters, double * Constraints, double Contras
     Sagg += 1.;
     I0 = ConcentrationOfSample*(I0Prot) * Scaling;
     Intensity = Scaling*Intensity/I0Prot;
-    //Intensity = I0*(
-    //Parameters[Xagg]*(1.+(pow(cabs(SFBeta),2.)/Intensity)*(Sagg-1.))*(Intensity/I0Prot)+(1.-Parameters[Xagg])*(Intensity/I0Prot)) ; //ConcentrationOfSample** Scaling*(Intensity/I0Prot)
-//      Intensity = I0*(
-//        Parameters[Xagg]*Sagg*(Intensity/I0Prot)+(1.-Parameters[Xagg])*(Intensity/I0Prot)) ; //ConcentrationOfSample** Scaling*(Intensity/I0Prot)
-
-
-    Intensity = Intensity  - Background; //* RPAStructureFactor(Intensity/I0,Parameters[INTERACTION])
-    return Intensity; //;
+    Intensity = Intensity  - Background;     return Intensity; //;
 }

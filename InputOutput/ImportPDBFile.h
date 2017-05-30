@@ -67,7 +67,7 @@ int CheckNumberOfAtomsInPDBFile(char Filename[256])
         if(sscanf(Linebuffer, "ATOM%*18c%d%*4c%lf%lf%lf", &DummyID, &xDummy, &yDummy, &zDummy) == 4){
             ++NumberOfAtoms;
         }
-        if(sscanf(Linebuffer, "HETATM%*18c%d%*4c%lf%lf%lf", &DummyID, &xDummy, &yDummy, &zDummy) == 4){
+        if(sscanf(Linebuffer, "HETATM%*16c%d%*4c%lf%lf%lf", &DummyID, &xDummy, &yDummy, &zDummy) == 4){
             ++NumberOfAtoms;
         }
     }
@@ -75,188 +75,6 @@ int CheckNumberOfAtomsInPDBFile(char Filename[256])
     fclose(PointerToFile);
 
     return NumberOfAtoms;
-}
-
-void ImportAtomsFromPDBFile(char Filename[256], struct Protein ProteinStruct, int NumberOfAtoms)
-{
-    // Declarations
-    FILE *PointerToFile;
-    char Linebuffer[256];
-    double xDummy;
-    double yDummy;
-    double zDummy;
-    char Dummychar;
-    char AtomName;
-    int DummyResidueID;
-    int IDOfCurrentAtom = 0;
-
-    // Physical values
-    const double HVolume = 5.15;
-    const double DVolume = 5.15;
-    const double CVolume = 16.44;
-    const double NVolume = 2.49;
-    const double OVolume = 9.13;
-    const double PVolume = 5.73;
-    const double SVolume = 19.86;
-    const double H2OVolume =  30.0;
-    const double CLVolume = 28.81;
-    const double ZNVolume = 9.85;
-
-
-    const double HXRayScatteringLength =  1.0 * 2.82e-13;
-    const double DXRayScatteringLength =  1.0 * 2.82e-13;
-    const double CXRayScatteringLength =  6.0 * 2.82e-13;
-    const double NXRayScatteringLength =  7.0 * 2.82e-13;
-    const double OXRayScatteringLength =  8.0 * 2.82e-13;
-    const double PXRayScatteringLength = 15.0 * 2.82e-13;
-    const double SXRayScatteringLength = 16.0 * 2.82e-13;
-    const double H2OXRayScatteringLength =  10.0 * 2.82e-13;
-    const double CLXRayScatteringLength = 17.0 * 2.82e-13;
-    const double ZNXRayScatteringLength = 30.0 * 2.82e-13;
-
-
-    const double HNeutronScatteringLength = -3.742e-13;
-    const double DNeutronScatteringLength = 6.674e-13;
-    const double CNeutronScatteringLength = 6.6484e-13;
-    const double NNeutronScatteringLength = 9.36e-13;
-    const double ONeutronScatteringLength = 5.803e-13;
-    const double PNeutronScatteringLength = 5.13E-13;
-    const double SNeutronScatteringLength = 2.847e-13;
-    const double CLNeutronScatteringLength = 5.13E-13;
-    const double ZNNeutronScatteringLength = 2.847e-13;
-    const double GlycanScale = 1.0;
-    // I/O
-    PointerToFile = fopen(Filename, "r");
-
-    while (fgets(Linebuffer, sizeof(Linebuffer), PointerToFile) != NULL) {
-
-        if (sscanf(Linebuffer, "ATOM%*9c%c%*8c%d%*4c%lf%lf%lf%*23c%c", &Dummychar, &DummyResidueID, &xDummy, &yDummy, &zDummy, &AtomName) == 6) {
-            ProteinStruct.Atoms[IDOfCurrentAtom].x    = xDummy;
-            ProteinStruct.Atoms[IDOfCurrentAtom].y    = yDummy;
-            ProteinStruct.Atoms[IDOfCurrentAtom].z    = zDummy;
-            ProteinStruct.Atoms[IDOfCurrentAtom].Name = AtomName;
-
-            switch (AtomName) {
-                case 'H':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength    = HXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = HNeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume                  = HVolume;
-                break;
-
-                case 'D':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength    = DXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = DNeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume                  = DVolume;
-                break;
-
-                case 'C':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength    = CXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = CNeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume                  = CVolume;
-                break;
-
-                case 'N':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength    = NXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = NNeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume                  = NVolume;
-                break;
-
-                case 'O':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength    = OXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = ONeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume                  = OVolume;
-                break;
-
-                case 'P':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength    = PXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = PNeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume                  = PVolume;
-                break;
-
-                case 'S':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength    = SXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = SNeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume                  = SVolume;
-                break;
-
-                case 'Q':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength = 4.092*H2OXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = SNeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume  = 4.092*(H2OVolume);
-                break;
-
-                default:
-                    printf("Encountered unknown atom in PDB-file - labelled %c at site %d.\n", AtomName, IDOfCurrentAtom);
-                break;
-            }
-
-            ++IDOfCurrentAtom;
-        }
-        if (sscanf(Linebuffer, "HETATM%*9c%c%*8c%d%*4c%lf%lf%lf%*23c%c", &Dummychar, &DummyResidueID, &xDummy, &yDummy, &zDummy, &AtomName) == 6) {
-            ProteinStruct.Atoms[IDOfCurrentAtom].x    = xDummy;
-            ProteinStruct.Atoms[IDOfCurrentAtom].y    = yDummy;
-            ProteinStruct.Atoms[IDOfCurrentAtom].z    = zDummy;
-            ProteinStruct.Atoms[IDOfCurrentAtom].Name = AtomName;
-
-            switch (AtomName) {
-                case 'H':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength    = HXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = HNeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume                  = GlycanScale*HVolume;
-                break;
-
-                case 'D':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength    = DXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = DNeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume                  = GlycanScale*DVolume;
-                break;
-
-                case 'C':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength    = CXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = CNeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume                  = GlycanScale*CVolume;
-                break;
-
-                case 'N':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength    = NXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = NNeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume                  = GlycanScale*NVolume;
-                break;
-
-                case 'O':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength    = OXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = ONeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume                  = GlycanScale*OVolume;
-                break;
-
-                case 'P':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength    = PXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = PNeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume                  = GlycanScale*PVolume;
-                break;
-
-                case 'S':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength    = SXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = SNeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume                  = GlycanScale*SVolume;
-                break;
-
-                case 'Q':
-                    ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength = 4.092*H2OXRayScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength = SNeutronScatteringLength;
-                    ProteinStruct.Atoms[IDOfCurrentAtom].Volume  = 4.092*(H2OVolume);
-                break;
-
-                default:
-                    printf("Encountered unknown atom in PDB-file - labelled %c at site %d.\n", AtomName, IDOfCurrentAtom);
-                break;
-            }
-
-            ++IDOfCurrentAtom;
-        }
-    }
-
-    fclose(PointerToFile);
 }
 
 void AssignAtom(char AtomName[2], double *XRayScatteringLengthOfCurrentAtom,double  *NeutronScatteringLengthOfCurrentAtom,double *VolumeOfCurrentAtom)
@@ -372,6 +190,57 @@ void AssignAtom(char AtomName[2], double *XRayScatteringLengthOfCurrentAtom,doub
 return;
 }
 
+
+void ImportAtomsFromPDBFile(char Filename[256], struct Protein ProteinStruct, int NumberOfAtoms)
+{
+    // Declarations
+    FILE *PointerToFile;
+    char Linebuffer[256];
+    double xDummy;
+    double yDummy;
+    double zDummy;
+    char Dummychar;
+    char AtomName[2];
+    int DummyResidueID;
+    int IDOfCurrentAtom = 0;
+
+    // I/O
+    PointerToFile = fopen(Filename, "r");
+
+    while (fgets(Linebuffer, sizeof(Linebuffer), PointerToFile) != NULL) {
+	//                     "ATOM%*9c%c%*8c%d%*4c%lf%lf%lf%*22c%2c", &Dummychar, &ResidueID,      &xDummy, &yDummy, &zDummy, &AtomName
+        if (sscanf(Linebuffer, "ATOM%*9c%c%*8c%d%*4c%lf%lf%lf%*22c%2c", &Dummychar, &DummyResidueID, &xDummy, &yDummy, &zDummy, &AtomName) == 6) {
+            
+	    ProteinStruct.Atoms[IDOfCurrentAtom].x    = xDummy;
+            ProteinStruct.Atoms[IDOfCurrentAtom].y    = yDummy;
+            ProteinStruct.Atoms[IDOfCurrentAtom].z    = zDummy;
+            //ProteinStruct.Atoms[IDOfCurrentAtom].Name = AtomName;
+
+	    // AssignAtom(AtomName, &ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].Volume);
+
+            ++IDOfCurrentAtom;
+        }
+	//                     "HETATM%d%*3c%c%*8c%*4c%lf%lf%lf%*22c%2c", &ResidueID,      &Dummychar, &xDummy, &yDummy, &zDummy, &AtomName
+        if (sscanf(Linebuffer, "HETATM%d%*3c%c%*8c%*4c%lf%lf%lf%*22c%2c", &DummyResidueID, &Dummychar, &xDummy, &yDummy, &zDummy, &AtomName) == 6) {
+
+	      
+	    ProteinStruct.Atoms[IDOfCurrentAtom].x    = xDummy;
+            ProteinStruct.Atoms[IDOfCurrentAtom].y    = yDummy;
+            ProteinStruct.Atoms[IDOfCurrentAtom].z    = zDummy;
+            //ProteinStruct.Atoms[IDOfCurrentAtom].Name = AtomName;
+
+
+           
+         //   AssignAtom(AtomName, &ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].Volume);
+
+            ++IDOfCurrentAtom;
+        }
+    }
+
+    fclose(PointerToFile);
+}
+
+
 void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct, int NumberOfResidues)
 {
     // Declarations
@@ -407,43 +276,6 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
     double yDummy;
     double zDummy;
 
-    // Physical values
-    const double HVolume = 5.15;
-    const double DVolume = 5.15;
-    const double CVolume = 16.44;
-    const double NVolume = 2.49;
-    const double OVolume = 9.13;
-    const double PVolume = 5.73;
-    const double SVolume = 19.86;
-    const double H2OVolume =  30.0;
-    const double CLVolume = 28.81;
-    const double ZNVolume = 9.85;
-
-
-    const double HXRayScatteringLength =  1.0 * 2.82e-13;
-    const double DXRayScatteringLength =  1.0 * 2.82e-13;
-    const double CXRayScatteringLength =  6.0 * 2.82e-13;
-    const double NXRayScatteringLength =  7.0 * 2.82e-13;
-    const double OXRayScatteringLength =  8.0 * 2.82e-13;
-    const double PXRayScatteringLength = 15.0 * 2.82e-13;
-    const double SXRayScatteringLength = 16.0 * 2.82e-13;
-    const double H2OXRayScatteringLength =  10.0 * 2.82e-13;
-    const double CLXRayScatteringLength = 17.0 * 2.82e-13;
-    const double ZNXRayScatteringLength = 30.0 * 2.82e-13;
-
-
-    const double HNeutronScatteringLength = -3.742e-13;
-    const double DNeutronScatteringLength = 6.674e-13;
-    const double CNeutronScatteringLength = 6.6484e-13;
-    const double NNeutronScatteringLength = 9.36e-13;
-    const double ONeutronScatteringLength = 5.803e-13;
-    const double PNeutronScatteringLength = 5.13E-13;
-    const double SNeutronScatteringLength = 2.847e-13;
-    const double CLNeutronScatteringLength = 5.13E-13;
-    const double ZNNeutronScatteringLength = 2.847e-13;
-    const double GlycanScale = 1.0;
-//    const double SNeutronScatteringLength = 10.0 * 2.82e-13;
-
 
     // I/O
     PointerToFile = fopen(Filename, "r");
@@ -452,17 +284,20 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
         ResidueID = 0;
 
         // **** These if statements are for testing what gets read
+	
 	if (sscanf(Linebuffer, "ATOM%*9c%c%*8c%d%*4c%lf%lf%lf%*22c%2c", &Dummychar, &ResidueID, &xDummy, &yDummy, &zDummy, &AtomName) == 6) {
         //Check that we read
         //printf("%s",Linebuffer);
         //printf("%i %s %c %i\n",ResidueID,AtomName, Dummychar,IDOfCurrentResidue);
         }
-        if (sscanf(Linebuffer, "HETATM%d%*3c%c%*8c%*4c%lf%lf%lf%*22c%2c", &ResidueID,&Dummychar,  &xDummy, &yDummy, &zDummy, &AtomName) == 6) {
+        
+	if (sscanf(Linebuffer, "HETATM%d%*3c%c%*8c%*4c%lf%lf%lf%*22c%2c", &ResidueID,&Dummychar,  &xDummy, &yDummy, &zDummy, &AtomName) == 6) {
         //Check that we read
         //printf("%s",Linebuffer);
         //printf("%i %s %c %i\n",ResidueID,AtomName, Dummychar,IDOfCurrentResidue);
 	}
-	// ****
+	
+ 	// ****
 	
         if (ResidueID != PreviousResidueID) {
 
@@ -527,7 +362,7 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
 //        printf("Atom %i ",sscanf(Linebuffer, "ATOM%*13c%3c", ProteinStruct.Residues[IDOfCurrentResidue].Name) );
 //        printf("%c \n",AtomName );
 //
-        AssignAtom(&AtomName, &XRayScatteringLengthOfCurrentAtom,&NeutronScatteringLengthOfCurrentAtom,&VolumeOfCurrentAtom);
+        AssignAtom(AtomName, &XRayScatteringLengthOfCurrentAtom,&NeutronScatteringLengthOfCurrentAtom,&VolumeOfCurrentAtom);
       }
 
         if (sscanf(Linebuffer, "HETATM%*11c%3c", ProteinStruct.Residues[IDOfCurrentResidue].Name)== 1) {
@@ -536,7 +371,7 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
 
          ProteinStruct.Residues[IDOfCurrentResidue].Name[0] = 'X';
          }
-	 AssignAtom(&AtomName, &XRayScatteringLengthOfCurrentAtom,&NeutronScatteringLengthOfCurrentAtom,&VolumeOfCurrentAtom);
+	 AssignAtom(AtomName, &XRayScatteringLengthOfCurrentAtom,&NeutronScatteringLengthOfCurrentAtom,&VolumeOfCurrentAtom);
   
       }
 

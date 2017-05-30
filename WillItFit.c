@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
         AllocateProteinStructure(&ProteinStructure, ProteinStructure.NumberOfResidues, ProteinStructure.NumberOfAtoms);
 
         ImportResiduesFromPDBFile(PDBFileLocation, ProteinStructure, ProteinStructure.NumberOfResidues);
-        //ImportAtomsFromPDBFile(PDBFileLocation, ProteinStructure, ProteinStructure.NumberOfAtoms);
+        ImportAtomsFromPDBFile(PDBFileLocation, ProteinStructure, ProteinStructure.NumberOfAtoms);
     }
 
     /// Decide fitting range and initialize the userdefined structure
