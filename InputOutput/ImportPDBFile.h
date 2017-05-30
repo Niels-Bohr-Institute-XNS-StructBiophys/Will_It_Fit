@@ -203,10 +203,11 @@ void ImportAtomsFromPDBFile(char Filename[256], struct Protein ProteinStruct, in
     char AtomName[2];
     int DummyResidueID;
     int IDOfCurrentAtom = 0;
-
+    int LinesToPrint = 10;
+    int CountLines = 0 ;
     // I/O
     PointerToFile = fopen(Filename, "r");
-
+printf("Printing first 10 atoms read\nType, x,y,z, ResidueNo\n");
     while (fgets(Linebuffer, sizeof(Linebuffer), PointerToFile) != NULL) {
 	//                     "ATOM%*9c%c%*8c%d%*4c%lf%lf%lf%*22c%2c", &Dummychar, &ResidueID,      &xDummy, &yDummy, &zDummy, &AtomName
         if (sscanf(Linebuffer, "ATOM%*9c%c%*8c%d%*4c%lf%lf%lf%*22c%2c", &Dummychar, &DummyResidueID, &xDummy, &yDummy, &zDummy, &AtomName) == 6) {
@@ -215,9 +216,12 @@ void ImportAtomsFromPDBFile(char Filename[256], struct Protein ProteinStruct, in
             ProteinStruct.Atoms[IDOfCurrentAtom].y    = yDummy;
             ProteinStruct.Atoms[IDOfCurrentAtom].z    = zDummy;
             //ProteinStruct.Atoms[IDOfCurrentAtom].Name = AtomName;
-
-	    // AssignAtom(AtomName, &ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].Volume);
-
+	    
+	    AssignAtom(AtomName, &ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].Volume);
+        if ( CountLines < LinesToPrint) {
+	    printf("%c%c %lf %lf %lf %d \n", AtomName[0], AtomName[1], xDummy, yDummy, zDummy,DummyResidueID );
+	    ++CountLines  ;
+	}
             ++IDOfCurrentAtom;
         }
 	//                     "HETATM%d%*3c%c%*8c%*4c%lf%lf%lf%*22c%2c", &ResidueID,      &Dummychar, &xDummy, &yDummy, &zDummy, &AtomName
@@ -231,8 +235,12 @@ void ImportAtomsFromPDBFile(char Filename[256], struct Protein ProteinStruct, in
 
 
            
-         //   AssignAtom(AtomName, &ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].Volume);
+          AssignAtom(AtomName, &ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].Volume);
+        if ( CountLines < LinesToPrint) {
+	     printf("%c%c %lf %lf %lf %d \n", AtomName[0], AtomName[1], xDummy, yDummy, zDummy,DummyResidueID );
 
+++CountLines ; 
+	}
             ++IDOfCurrentAtom;
         }
     }
@@ -247,6 +255,7 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
     FILE *PointerToFile;
     char Linebuffer[256];
     char AtomName[2];
+    char ResidueName[3];
     char Dummychar;
     int PreviousResidueID = 0;
     int ResidueID = 0;
@@ -275,8 +284,10 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
     double xDummy;
     double yDummy;
     double zDummy;
+	    
 
-
+    int LinesToPrint = 10;
+    int CountLines = 0;
     // I/O
     PointerToFile = fopen(Filename, "r");
 
@@ -284,13 +295,13 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
         ResidueID = 0;
 
         // **** These if statements are for testing what gets read
-	
-	if (sscanf(Linebuffer, "ATOM%*9c%c%*8c%d%*4c%lf%lf%lf%*22c%2c", &Dummychar, &ResidueID, &xDummy, &yDummy, &zDummy, &AtomName) == 6) {
+	//                     "ATOM%*9c%c%*8c%d%*4c%lf%lf%lf%*22c%2c", &Dummychar, &ResidueID,      &xDummy, &yDummy, &zDummy, &AtomName
+	if (sscanf(Linebuffer, "ATOM%*9c%c%*3c%3c%*2c%d%*c%lf%lf%lf%*22c%2c", &Dummychar, &ResidueName,&ResidueID, &xDummy, &yDummy, &zDummy, &AtomName) == 7) {
         //Check that we read
         //printf("%s",Linebuffer);
-        //printf("%i %s %c %i\n",ResidueID,AtomName, Dummychar,IDOfCurrentResidue);
-        }
-        
+
+	
+	}
 	if (sscanf(Linebuffer, "HETATM%d%*3c%c%*8c%*4c%lf%lf%lf%*22c%2c", &ResidueID,&Dummychar,  &xDummy, &yDummy, &zDummy, &AtomName) == 6) {
         //Check that we read
         //printf("%s",Linebuffer);
@@ -300,8 +311,11 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
  	// ****
 	
         if (ResidueID != PreviousResidueID) {
-
-            if (PreviousResidueID != 0) {
+        	if (CountLines < LinesToPrint) {
+        printf("%i, %c%c%c\n",ResidueID, ResidueName[0],ResidueName[1],ResidueName[2]);
+        ++CountLines;
+	}
+	    	if (PreviousResidueID != 0) {
 
                 ProteinStruct.Residues[IDOfCurrentResidue].Volume = VolumeOfResidue;
                 ProteinStruct.Residues[IDOfCurrentResidue].XRayScatteringLength = XRayScatteringLengthOfResidue;
