@@ -259,6 +259,119 @@ void ImportAtomsFromPDBFile(char Filename[256], struct Protein ProteinStruct, in
     fclose(PointerToFile);
 }
 
+void AssignAtom(char AtomName[2], double *XRayScatteringLengthOfCurrentAtom,double  *NeutronScatteringLengthOfCurrentAtom,double *VolumeOfCurrentAtom)
+{  // function for assigning the scattering length to the correct atoms
+   int AtomRecg = 0;
+
+    // Physical values
+    const double HVolume = 5.15;
+    const double DVolume = 5.15;
+    const double CVolume = 16.44;
+    const double NVolume = 2.49;
+    const double OVolume = 9.13;
+    const double PVolume = 5.73;
+    const double SVolume = 19.86;
+    const double H2OVolume =  30.0;
+    const double CLVolume = 28.81;
+    const double ZNVolume = 9.85;
+
+
+    const double HXRayScatteringLength =  1.0 * 2.82e-13;
+    const double DXRayScatteringLength =  1.0 * 2.82e-13;
+    const double CXRayScatteringLength =  6.0 * 2.82e-13;
+    const double NXRayScatteringLength =  7.0 * 2.82e-13;
+    const double OXRayScatteringLength =  8.0 * 2.82e-13;
+    const double PXRayScatteringLength = 15.0 * 2.82e-13;
+    const double SXRayScatteringLength = 16.0 * 2.82e-13;
+    const double H2OXRayScatteringLength =  10.0 * 2.82e-13;
+    const double CLXRayScatteringLength = 17.0 * 2.82e-13;
+    const double ZNXRayScatteringLength = 30.0 * 2.82e-13;
+
+
+    const double HNeutronScatteringLength = -3.742e-13;
+    const double DNeutronScatteringLength = 6.674e-13;
+    const double CNeutronScatteringLength = 6.6484e-13;
+    const double NNeutronScatteringLength = 9.36e-13;
+    const double ONeutronScatteringLength = 5.803e-13;
+    const double PNeutronScatteringLength = 5.13E-13;
+    const double SNeutronScatteringLength = 2.847e-13;
+    const double CLNeutronScatteringLength = 5.13E-13;
+    const double ZNNeutronScatteringLength = 2.847e-13;
+    const double GlycanScale = 1.0;
+//    const double SNeutronScatteringLength = 10.0 * 2.82e-13;
+
+// the following if statements are to read the atoms. Note this was done in a swich statement before
+        // but that does not work for multi character atom names such as "Zn"
+        if (AtomName[0] == ' ' && AtomName[1] == 'H' ){
+          *XRayScatteringLengthOfCurrentAtom = HXRayScatteringLength;
+          *NeutronScatteringLengthOfCurrentAtom = HNeutronScatteringLength;
+          *VolumeOfCurrentAtom = HVolume;
+          AtomRecg = 1;
+        }
+        if (AtomName[0] == ' ' && AtomName[1] == 'D' ){
+          *XRayScatteringLengthOfCurrentAtom = DXRayScatteringLength;
+          *NeutronScatteringLengthOfCurrentAtom = DNeutronScatteringLength;
+          *VolumeOfCurrentAtom = DVolume;
+          AtomRecg = 1;
+        }
+        if (AtomName[0] == ' ' && AtomName[1] == 'C' ){
+         *XRayScatteringLengthOfCurrentAtom = CXRayScatteringLength;
+         *NeutronScatteringLengthOfCurrentAtom = CNeutronScatteringLength;
+         *VolumeOfCurrentAtom = CVolume;
+          AtomRecg = 1;
+        }
+
+        if (AtomName[0] == ' ' && AtomName[1] == 'N' ){
+          *XRayScatteringLengthOfCurrentAtom = NXRayScatteringLength;
+          *NeutronScatteringLengthOfCurrentAtom = NNeutronScatteringLength;
+          *VolumeOfCurrentAtom = NVolume;
+          AtomRecg = 1;
+        }
+
+        if (AtomName[0] == ' ' && AtomName[1] == 'O' ){
+          *XRayScatteringLengthOfCurrentAtom = OXRayScatteringLength;
+          *NeutronScatteringLengthOfCurrentAtom = ONeutronScatteringLength;
+          *VolumeOfCurrentAtom = OVolume;
+          AtomRecg = 1;
+            }
+        if (AtomName[0] == ' ' && AtomName[1] == 'P' ){
+          *XRayScatteringLengthOfCurrentAtom = PXRayScatteringLength;
+          *NeutronScatteringLengthOfCurrentAtom = PNeutronScatteringLength;
+          *VolumeOfCurrentAtom = PVolume;
+          AtomRecg = 1;
+        }
+        if (AtomName[0] == ' ' && AtomName[1] == 'S' ){
+          *XRayScatteringLengthOfCurrentAtom = SXRayScatteringLength;
+          *NeutronScatteringLengthOfCurrentAtom = SNeutronScatteringLength;
+          *VolumeOfCurrentAtom = SVolume;
+          AtomRecg = 1;
+        }
+        if (AtomName[0] == ' ' && AtomName[1] == 'Q' ){
+          *XRayScatteringLengthOfCurrentAtom = 4.092*H2OXRayScatteringLength;
+          *NeutronScatteringLengthOfCurrentAtom = SNeutronScatteringLength;
+          *VolumeOfCurrentAtom = 4.092*(H2OVolume);
+          AtomRecg = 1;
+        }
+        if (AtomName[0] == 'Z' && AtomName[1] == 'N' ){
+          *XRayScatteringLengthOfCurrentAtom = ZNXRayScatteringLength;
+          *NeutronScatteringLengthOfCurrentAtom = ZNNeutronScatteringLength;
+          *VolumeOfCurrentAtom = ZNVolume;
+          AtomRecg = 1;
+        }
+
+        if (AtomName[0] == 'C' && AtomName[1] == 'L' ){
+          *XRayScatteringLengthOfCurrentAtom = CLXRayScatteringLength;
+          *NeutronScatteringLengthOfCurrentAtom = CLNeutronScatteringLength;
+          *VolumeOfCurrentAtom = CLVolume;
+          AtomRecg = 1;
+        }
+        if (AtomRecg == 0){
+          printf("Atom name %c%c not found in database\n", AtomName[0],AtomName[1]);
+        }
+        AtomRecg = 0;
+return;
+}
+
 void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct, int NumberOfResidues)
 {
     // Declarations
@@ -269,7 +382,6 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
     int PreviousResidueID = 0;
     int ResidueID = 0;
     int IDOfCurrentResidue = 0;
-    int AtomRecg = 0; // value for checking that atom is found in database
 
     double VolumeOfResidue = 0.0;
     double XRayScatteringLengthOfResidue = 0.0;
@@ -414,155 +526,18 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
         if (sscanf(Linebuffer, "ATOM%*13c%3c", ProteinStruct.Residues[IDOfCurrentResidue].Name)== 1) {
 //        printf("Atom %i ",sscanf(Linebuffer, "ATOM%*13c%3c", ProteinStruct.Residues[IDOfCurrentResidue].Name) );
 //        printf("%c \n",AtomName );
-
-        // the following if statements are to read the atoms. Note this was done in a swich statement before
-        // but that does not work for multi character atom names such as "Zn"
-        if (AtomName[0] == ' ' && AtomName[1] == 'H' ){
-          XRayScatteringLengthOfCurrentAtom = HXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = HNeutronScatteringLength;
-          VolumeOfCurrentAtom = HVolume;
-          AtomRecg = 1;
-        }
-        if (AtomName[0] == ' ' && AtomName[1] == 'D' ){
-          XRayScatteringLengthOfCurrentAtom = DXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = DNeutronScatteringLength;
-          VolumeOfCurrentAtom = DVolume;
-          AtomRecg = 1;
-        }
-        if (AtomName[0] == ' ' && AtomName[1] == 'C' ){
-          XRayScatteringLengthOfCurrentAtom = CXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = CNeutronScatteringLength;
-          VolumeOfCurrentAtom = CVolume;
-          AtomRecg = 1;
-        }
-
-        if (AtomName[0] == ' ' && AtomName[1] == 'N' ){
-          XRayScatteringLengthOfCurrentAtom = NXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = NNeutronScatteringLength;
-          VolumeOfCurrentAtom = NVolume;
-          AtomRecg = 1;
-        }
-
-        if (AtomName[0] == ' ' && AtomName[1] == 'O' ){
-          XRayScatteringLengthOfCurrentAtom = OXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = ONeutronScatteringLength;
-          VolumeOfCurrentAtom = OVolume;
-          AtomRecg = 1;
-            }
-        if (AtomName[0] == ' ' && AtomName[1] == 'P' ){
-          XRayScatteringLengthOfCurrentAtom = PXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = PNeutronScatteringLength;
-          VolumeOfCurrentAtom = PVolume;
-          AtomRecg = 1;
-        }
-        if (AtomName[0] == ' ' && AtomName[1] == 'S' ){
-          XRayScatteringLengthOfCurrentAtom = SXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = SNeutronScatteringLength;
-          VolumeOfCurrentAtom = SVolume;
-          AtomRecg = 1;
-        }
-        if (AtomName[0] == ' ' && AtomName[1] == 'Q' ){
-          XRayScatteringLengthOfCurrentAtom = 4.092*H2OXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = SNeutronScatteringLength;
-          VolumeOfCurrentAtom = 4.092*(H2OVolume);
-          AtomRecg = 1;
-        }
-        if (AtomName[0] == 'Z' && AtomName[1] == 'N' ){
-          XRayScatteringLengthOfCurrentAtom = ZNXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = ZNNeutronScatteringLength;
-          VolumeOfCurrentAtom = ZNVolume;
-          AtomRecg = 1;
-        }
-
-        if (AtomName[0] == 'C' && AtomName[1] == 'L' ){
-          XRayScatteringLengthOfCurrentAtom = CLXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = CLNeutronScatteringLength;
-          VolumeOfCurrentAtom = CLVolume;
-          AtomRecg = 1;
-        }
-        if (AtomRecg == 0){
-          printf("Atom name %c%c not found in database\n", AtomName[0],AtomName[1]);
-        }
-        AtomRecg = 0;
+//
+        AssignAtom(&AtomName, &XRayScatteringLengthOfCurrentAtom,&NeutronScatteringLengthOfCurrentAtom,&VolumeOfCurrentAtom);
       }
+
         if (sscanf(Linebuffer, "HETATM%*11c%3c", ProteinStruct.Residues[IDOfCurrentResidue].Name)== 1) {
 //        printf("hetatm %i ",sscanf(Linebuffer, "HETATM%*13c%3c", ProteinStruct.Residues[IDOfCurrentResidue].Name) );
           if (ProteinStruct.Residues[IDOfCurrentResidue].Name[2] != '9' ){
 
          ProteinStruct.Residues[IDOfCurrentResidue].Name[0] = 'X';
          }
-        // the following if statements are to read te atoms. Note this was done in a swich statement before
-        // but that does not work for multi character atom names such as "Zn"
-        if (AtomName[0] == ' ' && AtomName[1] == 'H' ){
-          XRayScatteringLengthOfCurrentAtom = HXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = HNeutronScatteringLength;
-          VolumeOfCurrentAtom = HVolume;
-          AtomRecg = 1;
-        }
-        if (AtomName[0] == ' ' && AtomName[1] == 'D' ){
-          XRayScatteringLengthOfCurrentAtom = DXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = DNeutronScatteringLength;
-          VolumeOfCurrentAtom = DVolume;
-          AtomRecg = 1;
-        }
-        if (AtomName[0] == ' ' && AtomName[1] == 'C' ){
-          XRayScatteringLengthOfCurrentAtom = CXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = CNeutronScatteringLength;
-          VolumeOfCurrentAtom = CVolume;
-          AtomRecg = 1;
-        }
-
-        if (AtomName[0] == ' ' && AtomName[1] == 'N' ){
-          XRayScatteringLengthOfCurrentAtom = NXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = NNeutronScatteringLength;
-          VolumeOfCurrentAtom = NVolume;
-          AtomRecg = 1;
-        }
-
-        if (AtomName[0] == ' ' && AtomName[1] == 'O' ){
-          XRayScatteringLengthOfCurrentAtom = OXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = ONeutronScatteringLength;
-          VolumeOfCurrentAtom = OVolume;
-          AtomRecg = 1;
-            }
-        if (AtomName[0] == ' ' && AtomName[1] == 'P'){
-          XRayScatteringLengthOfCurrentAtom = PXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = PNeutronScatteringLength;
-          VolumeOfCurrentAtom = PVolume;
-          AtomRecg = 1;
-        }
-        if (AtomName[0] == ' ' && AtomName[1] == 'S' ){
-          XRayScatteringLengthOfCurrentAtom = SXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = SNeutronScatteringLength;
-          VolumeOfCurrentAtom = SVolume;
-          AtomRecg = 1;
-        }
-        if (AtomName[0] == ' ' && AtomName[1] == 'Q' ){
-          XRayScatteringLengthOfCurrentAtom = 4.092*H2OXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = SNeutronScatteringLength;
-          VolumeOfCurrentAtom = 4.092*(H2OVolume);
-          AtomRecg = 1;
-        }
-
-        if (AtomName[0] == 'Z' && AtomName[1] == 'N' ){
-          XRayScatteringLengthOfCurrentAtom = ZNXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = ZNNeutronScatteringLength;
-          VolumeOfCurrentAtom = ZNVolume;
-          AtomRecg = 1;
-        }
-
-        if (AtomName[0] == 'C' && AtomName[1] == 'L' ){
-          XRayScatteringLengthOfCurrentAtom = CLXRayScatteringLength;
-          NeutronScatteringLengthOfCurrentAtom = CLNeutronScatteringLength;
-          VolumeOfCurrentAtom = CLVolume;
-          AtomRecg = 1;
-        }
-
-        if (AtomRecg == 0){
-          printf("Atom name %c%c not found in database\n", AtomName[0],AtomName[1]);
-          printf("%s \n", Linebuffer);
-        }
-        AtomRecg = 0;
+	 AssignAtom(&AtomName, &XRayScatteringLengthOfCurrentAtom,&NeutronScatteringLengthOfCurrentAtom,&VolumeOfCurrentAtom);
+  
       }
 
         VolumeOfResidue += VolumeOfCurrentAtom;
