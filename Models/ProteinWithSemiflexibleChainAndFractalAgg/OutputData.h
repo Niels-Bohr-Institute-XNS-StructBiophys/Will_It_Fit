@@ -58,7 +58,13 @@ void OutputData(double ChiSquare, double QMin, double QMax, struct Parameter * P
     }
 
     fprintf(fp, "\n");
-
+    // Print info on protein file
+    //
+    int AtomsToPrint = 10;
+    fprintf(fp,"Residue name, Residue ID. Note: when doing all atom calculations each atom is considered a residue and there will be multiple \"residues\" with the same name but different IDs\n")
+    for(i = 0; i < AtomsToPrint; ++i){
+    fprintf(fp, "%c%c%c%d\n",ProteinStructure.Residues[i].Name[0],ProteinStructure.Residues[i].Name[1],ProteinStructure.Residues[i].Name[2],i);
+    }
     // Close file and end program
     fclose(fp);
 }

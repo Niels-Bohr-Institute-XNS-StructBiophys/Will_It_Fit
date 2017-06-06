@@ -7,9 +7,8 @@ int CheckNumberOfResiduesInPDBFile(char Filename[256])
     double yDummy;
     double zDummy;
     int NumberOfResidues = 0;
-    int ResidueID = 0;
     int PreviousResidueID = 0;
-
+    int ResidueID;
     // I/O
     PointerToFile = fopen(Filename, "r");
 
@@ -21,7 +20,8 @@ int CheckNumberOfResiduesInPDBFile(char Filename[256])
     while(fgets(Linebuffer, sizeof(Linebuffer), PointerToFile) != NULL) {
         ResidueID = 0;
 
-        if(sscanf(Linebuffer, "ATOM%*18c%d%*4c%lf%lf%lf", &ResidueID, &xDummy, &yDummy, &zDummy) == 4){
+        //if(sscanf(Linebuffer, "ATOM%*18c%d%*4c%lf%lf%lf", &ResidueID, &xDummy, &yDummy, &zDummy) == 4){
+        if(sscanf(Linebuffer, "ATOM%*2C%d%*18c%*4c%lf%lf%lf", &ResidueID, &xDummy, &yDummy, &zDummy) == 4){
 
             if(ResidueID != PreviousResidueID && ResidueID != 0) {
                 ++NumberOfResidues;
@@ -218,7 +218,7 @@ printf("Printing first 10 atoms read\nType, x,y,z, ResidueNo\n");
             //ProteinStruct.Atoms[IDOfCurrentAtom].Name = AtomName;
 	    
 	    AssignAtom(AtomName, &ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].Volume);
-        if ( CountLines < LinesToPrint) {
+        if ( CountLines < LinesToPrint) { // Print first 10 atom read. can be changed by LinesToPrint
 	    printf("%c%c %lf %lf %lf %d \n", AtomName[0], AtomName[1], xDummy, yDummy, zDummy,DummyResidueID );
 	    ++CountLines  ;
 	}
@@ -236,7 +236,7 @@ printf("Printing first 10 atoms read\nType, x,y,z, ResidueNo\n");
 
            
           AssignAtom(AtomName, &ProteinStruct.Atoms[IDOfCurrentAtom].XRayScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].NeutronScatteringLength,&ProteinStruct.Atoms[IDOfCurrentAtom].Volume);
-        if ( CountLines < LinesToPrint) {
+        if ( CountLines < LinesToPrint) {// Print first 10 atom read. can be changed by LinesToPrint
 	     printf("%c%c %lf %lf %lf %d \n", AtomName[0], AtomName[1], xDummy, yDummy, zDummy,DummyResidueID );
 
 ++CountLines ; 
@@ -291,18 +291,27 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
     // I/O
     PointerToFile = fopen(Filename, "r");
 
+    // Reading of Aminoacids:
+    // We read each line that starts with either "ATOM" or "HETATM"
+    // For the "ATOM" lines residues are assigned based on ResidueID.
+    // Each residue has a weight, a volume and a scattering length density (in xrays and neutrons)
+    // As the lines are read these properties are updated according the atom on the current line until the ResidueID changes
+   
     while (fgets(Linebuffer, sizeof(Linebuffer), PointerToFile) != NULL) { //Read File, defined above, line by line and store it in "Linebuffer"
         ResidueID = 0;
 
         // **** These if statements are for testing what gets read
 	//                     "ATOM%*9c%c%*8c%d%*4c%lf%lf%lf%*22c%2c", &Dummychar, &ResidueID,      &xDummy, &yDummy, &zDummy, &AtomName
-	if (sscanf(Linebuffer, "ATOM%*9c%c%*3c%3c%*2c%d%*c%lf%lf%lf%*22c%2c", &Dummychar, &ResidueName,&ResidueID, &xDummy, &yDummy, &zDummy, &AtomName) == 7) {
-        //Check that we read
+	//if (sscanf(Linebuffer, "ATOM%*9c%c%*3c%3c%*2c%d%*c%lf%lf%lf%*22c%2c", &Dummychar, &ResidueName,&ResidueID, &xDummy, &yDummy, &zDummy, &AtomName) == 7) { //This Line for reading amino acids
+        
+	if (sscanf(Linebuffer, "ATOM%d%*3c%c%*2c%3c%*6c%lf%lf%lf%*22c%2c", &ResidueID,&Dummychar,  &ResidueName, &xDummy, &yDummy, &zDummy, &AtomName) == 7) { // This line for reading individual atoms
+
+	//Check that we read
         //printf("%s",Linebuffer);
 
 	
 	}
-	if (sscanf(Linebuffer, "HETATM%d%*3c%c%*8c%*4c%lf%lf%lf%*22c%2c", &ResidueID,&Dummychar,  &xDummy, &yDummy, &zDummy, &AtomName) == 6) {
+	if (sscanf(Linebuffer, "HETATM%d%*3c%c%*12c%lf%lf%lf%*22c%2c", &ResidueID,&Dummychar,  &xDummy, &yDummy, &zDummy, &AtomName) == 6) {
         //Check that we read
         //printf("%s",Linebuffer);
         //printf("%i %s %c %i\n",ResidueID,AtomName, Dummychar,IDOfCurrentResidue);

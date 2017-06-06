@@ -17,24 +17,24 @@ double Model(double q, double * Parameters, double * Constraints, double Contras
     double complex ** Beta = ComplexArray(NumberOfHarmonics + 1, NumberOfHarmonics + 1);
 
 
+	//Loop over residues
+      for(j = 0; j < ProteinStructure.NumberOfResidues; j++){ // for AA based calculation
+	
+	     
+    	      CopyResidue(&ProteinStructure.Residues[j], &CurrentResidue); // For AA based calculation
+// 	      if (q ==0.5 ){ //Print statement for housekeeping
+//                            printf("current residue: %c Volume %0.2e \n", *CurrentResidue.Name, CurrentResidue.Volume);
+//			   }
+             
+	      if (*CurrentResidue.Name == 'W') {
+                 				CurrentResidue.Volume = CurrentResidue.Volume/Parameters[HYDR];
+           				      	}
 
-      for(j = 0; j < ProteinStructure.NumberOfResidues; j++){
-//	for(j = 0; j < ProteinStructure.NumberOfAtoms; j++){
-
-    	      CopyResidue(&ProteinStructure.Residues[j], &CurrentResidue);
-//        printf("current residue: %c Volume %0.2e \n", *CurrentResidue.Name, CurrentResidue.Volume);
-          if (*CurrentResidue.Name == 'W') {
-          CurrentResidue.Volume = CurrentResidue.Volume/Parameters[HYDR];
-
-    }
-    if (*CurrentResidue.Name == 'X') {
-    CurrentResidue.Volume = CurrentResidue.Volume/Parameters[GLYCV];
-}
-		      AddScatteringFromResidue(Beta, q, CurrentResidue, Contrast, ScatteringLengthDensityOfWater, 1.0); // Parameters[PROTSCALE]);
-         // AddScatteringFromResidue(BetaProt, Q0, CurrentResidue, Contrast, ScatteringLengthDensityOfWater, 1.0 ); //Parameters[PROTSCALE]);
-
-      }
-
+              if (*CurrentResidue.Name == 'X') {
+    	    					CurrentResidue.Volume = CurrentResidue.Volume/Parameters[GLYCV];
+          					}
+	     AddScatteringFromResidue(Beta, q, CurrentResidue, Contrast, ScatteringLengthDensityOfWater, 1.0); // Parameters[PROTSCALE]);
+	}
 
 
     // Calculate intensity
