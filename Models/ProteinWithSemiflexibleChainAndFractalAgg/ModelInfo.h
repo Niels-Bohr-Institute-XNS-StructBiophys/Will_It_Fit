@@ -11,7 +11,7 @@
  #include <gsl/gsl_sf_bessel.h>
 
  //Order of harmonics
- #define NumberOfHarmonics 17
+ #define NumberOfHarmonics 20
  #include "MathAndHelpfunctions.h"
 #include "Constraints.h"
 //#include "SemiflexibleChain.h"

@@ -22,15 +22,16 @@ double Model(double q, double * Parameters, double * Constraints, double Contras
 	
 	     
     	      CopyResidue(&ProteinStructure.Residues[j], &CurrentResidue); // For AA based calculation
+	      
 // 	      if (q ==0.5 ){ //Print statement for housekeeping
 //                            printf("current residue: %c Volume %0.2e \n", *CurrentResidue.Name, CurrentResidue.Volume);
 //			   }
              
-	      if (*CurrentResidue.Name == 'W') {
+	      if (strcmp(CurrentResidue.Name,"W") == 0 ) {
                  				CurrentResidue.Volume = CurrentResidue.Volume/Parameters[HYDR];
            				      	}
 
-              if (*CurrentResidue.Name == 'X') {
+              if (strcmp(CurrentResidue.Name,  "X") == 0 ) {
     	    					CurrentResidue.Volume = CurrentResidue.Volume/Parameters[GLYCV];
           					}
 	     AddScatteringFromResidue(Beta, q, CurrentResidue, Contrast, ScatteringLengthDensityOfWater, 1.0); // Parameters[PROTSCALE]);
@@ -61,6 +62,6 @@ double Model(double q, double * Parameters, double * Constraints, double Contras
         Background = Parameters[BACKX];
     }
     I0 = ConcentrationOfSample*(I0Prot) * Scaling;
-    Intensity = Scaling*Intensity/pow(2.82e-13,2);
+    Intensity = Scaling*Intensity/pow(2.8179e-13,2);
     Intensity = Intensity  - Background;     return Intensity; //;
 }

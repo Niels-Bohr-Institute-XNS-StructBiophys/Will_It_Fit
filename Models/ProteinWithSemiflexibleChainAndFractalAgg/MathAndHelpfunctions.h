@@ -167,6 +167,7 @@ void AddScatteringFromResidue(double complex **Beta, double q, struct Residue Cu
 
 
 	// Calculate spherical Bessel functions for l = 0 to NumberOfHarmonics
+
     gsl_sf_bessel_jl_array(NumberOfHarmonics, q * Radius, Bessel);
 
 	// Calculate Legendre polynomials P_l(cos(theta)) of degree l = m to NumberOfHarmonics - store the values in Legendre[m], Legendre[m + 1], ..., Legendre[NumberOfHarmonics]

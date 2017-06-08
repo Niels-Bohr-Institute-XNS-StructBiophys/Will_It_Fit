@@ -61,10 +61,30 @@ void OutputData(double ChiSquare, double QMin, double QMax, struct Parameter * P
     // Print info on protein file
     //
     int AtomsToPrint = 10;
-    fprintf(fp,"Residue name, Residue ID. Note: when doing all atom calculations each atom is considered a residue and there will be multiple \"residues\" with the same name but different IDs\n")
+    fprintf(fp,"Residue name, Residue ID. Note: when doing all atom calculations each atom is considered a residue and there will be multiple \"residues\" with the same name but different IDs\n");
     for(i = 0; i < AtomsToPrint; ++i){
-    fprintf(fp, "%c%c%c%d\n",ProteinStructure.Residues[i].Name[0],ProteinStructure.Residues[i].Name[1],ProteinStructure.Residues[i].Name[2],i);
+    fprintf(fp, "%s %d\n",ProteinStructure.Residues[i].Name,i);
     }
+    // Calculate Molecular Weigth
+    double Weight = 0.0;
+   double WeightModification = 0.0;
+  double VolumeModification = 0.0; 
+    for (i = 0; i < ProteinStructure.NumberOfResidues; ++i){
+	    if(strcmp(ProteinStructure.Residues[i].Name, "W") != 0 ){ // Skip waters in calculation of molecular weight
+	   
+	Weight += ProteinStructure.Residues[i].Weight;
+	    }
+	 if(strcmp(ProteinStructure.Residues[i].Name, "X") == 0 ){ // Calculate Molecular Weight of Fatty Acids
+	VolumeModification +=  ProteinStructure.Residues[i].Volume;
+	WeightModification += ProteinStructure.Residues[i].Weight;
+	    }    
+    }
+    fprintf(fp, "Molecular Weight: %f\n",Weight);
+    fprintf(fp, "Molecular Weight of Modification (Total): %f\n",WeightModification);
+    fprintf(fp, "Volume of Modification (Total): %f\n",VolumeModification/Parameters[8].Value);
+    fprintf(fp, "Specific Volume of Modification (Total): %f\n",VolumeModification * 1e-24 *6.022e23/(WeightModification * Parameters[8].Value) );
+
+
     // Close file and end program
     fclose(fp);
 }
