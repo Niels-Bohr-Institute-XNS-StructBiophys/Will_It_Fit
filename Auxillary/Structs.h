@@ -63,7 +63,7 @@ struct Residue {
     double Volume;
     double Weight;
     // Book-keeping
-    char Name[5];
+    char Name[4];
     int ResidueID;
 };
 

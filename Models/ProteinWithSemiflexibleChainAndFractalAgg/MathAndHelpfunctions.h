@@ -199,6 +199,8 @@ void CopyResidue(struct Residue * Original, struct Residue * Copy) {
 	Copy->Name[0]   = Original->Name[0];
 	Copy->Name[1]   = Original->Name[1];
 	Copy->Name[2]   = Original->Name[2];
+	Copy->Name[3]   = Original->Name[3];
+//	printf("%s\n", Copy->Name);
 	Copy->ResidueID = Original->ResidueID;
 }
 

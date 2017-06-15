@@ -192,7 +192,7 @@ void AssignAtom(char AtomName[2], double *XRayScatteringLengthOfCurrentAtom,doub
         }
         if (AtomName[0] == ' ' && AtomName[1] == 'Q' ){
           *XRayScatteringLengthOfCurrentAtom = 4.092*H2OXRayScatteringLength;
-          *NeutronScatteringLengthOfCurrentAtom = SNeutronScatteringLength;
+          //*NeutronScatteringLengthOfCurrentAtom = SNeutronScatteringLength;
           *VolumeOfCurrentAtom = 4.092*(H2OVolume);
 	  *WeightOfCurrentAtom = 4.092*(2*HWeight+OWeight);
           AtomRecg = 1;
@@ -334,14 +334,15 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
         // **** These if statements are for testing what gets read
 	//                     "ATOM%*9c%c%*8c%d%*4c%lf%lf%lf%*22c%2c", &Dummychar, &ResidueID,      &xDummy, &yDummy, &zDummy, &AtomName
 	//if (sscanf(Linebuffer, "ATOM%*9c%c%*3c%3c%*2c%d%*c%lf%lf%lf%*22c%2c", &Dummychar, &ResidueName,&ResidueID, &xDummy, &yDummy, &zDummy, &AtomName) == 7) { //This Line for reading amino acids
-        if (sscanf(Linebuffer, "ATOM%5d%*3c%c%*3c%3c%*6c%lf%lf%lf%*22c%2c", &ResidueID,&Dummychar,  &ResidueName[0], &xDummy, &yDummy, &zDummy, &AtomName[0]) == 7) { // This line for reading individual atoms
+        if (sscanf(Linebuffer, "ATOM  %5d%*6c%*3c%*9c%lf%lf%lf%*22c%2c", &ResidueID, &xDummy, &yDummy, &zDummy, &*AtomName) == 5) { // This line for reading individual atoms
 	//Check that we read
-        //printf("%s",Linebuffer);
+        //printf("%s, %f,%f,%f\n",ResidueName, xDummy, yDummy, zDummy);
 
 	
 	}
 
-	else if (sscanf(Linebuffer, "HETATM%5d%*3c%c%*3c%3c%*6c%lf%lf%lf%*22c%2c", &ResidueID,&Dummychar,  &ResidueName[0], &xDummy, &yDummy, &zDummy, &AtomName[0]) == 7) {
+
+	else if (sscanf(Linebuffer, "HETATM%5d%*6c%*3c%*9c%lf%lf%lf%*22c%2c", &ResidueID, &xDummy, &yDummy, &zDummy, &*AtomName) == 5) {
 		//Check that we read
         //printf("%s",Linebuffer);
         //printf("%i %s %c %i\n",ResidueID,AtomName, Dummychar,IDOfCurrentResidue);
@@ -352,12 +353,15 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
 	}
 	
  	// ****
-	
         if (ResidueID != PreviousResidueID) {
-        	if (CountLines < LinesToPrint) {
-        printf("%i, %s\n",ResidueID, ResidueName);
-        ++CountLines;
-	}
+//        	if (CountLines < LinesToPrint) {
+//        printf("%i, %f,%f,%f\n",ResidueID, xDummy, yDummy, zDummy);
+//         ++CountLines;
+//	}
+//        	if (ResidueID >= NumberOfResidues- LinesToPrint) {
+//        printf("%i, %f,%f,%f\n",ResidueID, xDummy, yDummy, zDummy);
+//	}	
+	//++CountLines;
 	    	if (PreviousResidueID != 0) {
 
                 ProteinStruct.Residues[IDOfCurrentResidue].Volume = VolumeOfResidue;
@@ -419,15 +423,15 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
         }
 
         if (sscanf(Linebuffer, "ATOM%*13c%3c", ProteinStruct.Residues[IDOfCurrentResidue].Name)== 1) {
-//        printf("Atom %i ",sscanf(Linebuffer, "ATOM%*13c%3c", ProteinStruct.Residues[IDOfCurrentResidue].Name) );
-//        printf("%c \n",AtomName );
+//        printf("Atom %s \n",ProteinStruct.Residues[IDOfCurrentResidue].Name);
 //
         AssignAtom(AtomName, &XRayScatteringLengthOfCurrentAtom,&NeutronScatteringLengthOfCurrentAtom,&VolumeOfCurrentAtom, &WeightOfCurrentAtom);
       }
 
         if (sscanf(Linebuffer, "HETATM%*11c%3c", ProteinStruct.Residues[IDOfCurrentResidue].Name)== 1) {
-//        printf("hetatm %i ",sscanf(Linebuffer, "HETATM%*13c%3c", ProteinStruct.Residues[IDOfCurrentResidue].Name) );
-          if (strcmp(ProteinStruct.Residues[IDOfCurrentResidue].Name, "UZ9") == 0 ){ //Does Residue name match "UZ9"
+//       printf("hetatm %s \n",ProteinStruct.Residues[IDOfCurrentResidue].Name) ;
+
+	if (strcmp(ProteinStruct.Residues[IDOfCurrentResidue].Name, "UZ9") == 0 ){ //Does Residue name match "UZ9"
               strcpy(ProteinStruct.Residues[IDOfCurrentResidue].Name, "X"); //Change name to "X" 
 
 	  }

@@ -24,12 +24,12 @@ double Model(double q, double * Parameters, double * Constraints, double Contras
     	      CopyResidue(&ProteinStructure.Residues[j], &CurrentResidue); // For AA based calculation
 	      
 // 	      if (q ==0.5 ){ //Print statement for housekeeping
-//                            printf("current residue: %c Volume %0.2e \n", *CurrentResidue.Name, CurrentResidue.Volume);
+//                            printf("current residue: %s Volume %0.2e %f,%f,%f\n",CurrentResidue.Name, CurrentResidue.Volume, CurrentResidue.xVolume, CurrentResidue.yVolume,CurrentResidue.zVolume);
 //			   }
              
-	      if (strcmp(CurrentResidue.Name,"W") == 0 ) {
+	      if (strcmp(CurrentResidue.Name, "WAT") == 0 ) {
                  				CurrentResidue.Volume = CurrentResidue.Volume/Parameters[HYDR];
-           				      	}
+	      }
 
               if (strcmp(CurrentResidue.Name,  "X") == 0 ) {
     	    					CurrentResidue.Volume = CurrentResidue.Volume/Parameters[GLYCV];
