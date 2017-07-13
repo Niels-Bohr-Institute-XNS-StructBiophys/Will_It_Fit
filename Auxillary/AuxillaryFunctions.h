@@ -75,6 +75,77 @@ void AssignFittingRanges(struct Dataset * Data, double QMin, double QMax, int Nu
 }
 
 /// Function used to assign arguments from the console to the appropriate variables
+void AssignArgumentsBash(int NumberOfArguments, char *Arguments[], char CardFileLocation[256], char SamplesFileLocation[256], char ParameterFileLocation[256],
+                     double *QMin, double *QMax,
+                     bool *IncludeResolutionEffects, int *NumberOfSmearingFolds, char ResolutionFileLocation[256],
+                     char PDBFileLocation[256], int *ComputeModel)
+{
+    // Declarations
+    int i;
+
+    char Category;
+    char Argument[256];
+
+    // Main loop
+    for (i = 1; i < NumberOfArguments; ++i) {
+
+        // Scan and assign
+        sscanf(Arguments[i], "-%c=%s", &Category, Argument);
+
+        switch (Category) {
+
+            // .card-file location
+            case 'c':
+                sprintf(CardFileLocation, "%s", Argument);
+            break;
+
+            // Samples file location
+            case 's':
+                sprintf(SamplesFileLocation, "%s", Argument);
+            break;
+
+            // Parameter file location
+            case 'p':
+                sprintf(ParameterFileLocation, "%s", Argument);
+            break;
+
+            // Fitting range
+            case 'n':
+                *QMin = atof(Argument);
+            break;
+
+            case 'x':
+                *QMax = atof(Argument);
+            break;
+
+            // Obtain resolution information
+            case 't':
+                if (atoi(Argument) != 0) {
+                    *IncludeResolutionEffects = true;
+                    *NumberOfSmearingFolds = atoi(Argument);
+                }
+            break;
+
+            case 'e':
+                sprintf(ResolutionFileLocation, "%s", Argument);
+            break;
+
+            // .pdb-file location
+            case 'd':
+                sprintf(PDBFileLocation, "%s", Argument);
+            break;
+	   // Will we fit or compute model? 
+	    case 'f':
+               *ComputeModel = atoi(Argument);
+            break;
+
+            // Unknown argument
+            default:
+                printf("Unknown arguments passed to algorithm! \n");
+            break;
+        }
+    }
+}
 void AssignArguments(int NumberOfArguments, char *Arguments[], char CardFileLocation[256], char SamplesFileLocation[256], char ParameterFileLocation[256],
                      double *QMin, double *QMax, int *ChooseFittingRoutine, int *FittingRoutineArgument2,
                      bool *IncludeResolutionEffects, int *NumberOfSmearingFolds, char ResolutionFileLocation[256], bool *PrintCorrelationMatrix,

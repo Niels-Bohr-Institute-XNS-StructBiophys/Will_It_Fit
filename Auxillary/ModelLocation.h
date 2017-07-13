@@ -1,1 +1,1 @@
- 
+#include "/Users/nicholas/Documents/ERDA_NSG/Seafile/StructuralBioPhysics/NanodiscTitration/NanodiscTitrationAndShapeModulationArticle/NewData/SECSAXS-Analysis/WIFCombined/Models/Nanodisc/ModelInfo.h"

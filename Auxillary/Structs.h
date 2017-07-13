@@ -38,7 +38,7 @@ struct Atom {
     double XRayScatteringLength;
     double NeutronScatteringLength;
     double Volume;
-
+    double Weight;
     // Book-keeping
     char Name;
 };
@@ -61,9 +61,10 @@ struct Residue {
     double XRayScatteringLength;
     double NeutronScatteringLength;
     double Volume;
-
+    double Weight;
     // Book-keeping
-    char Name[5];
+    char Name[4];
+    char AtomName[3]; // Fake name for atom. works when each atom is considered a residue
     int ResidueID;
 };
 
@@ -73,4 +74,6 @@ struct Protein {
     int NumberOfAtoms;
     int NumberOfResidues;
     char PDBFileLocation[256];
+    double Weight;
+    char ModificationName[4];
 };

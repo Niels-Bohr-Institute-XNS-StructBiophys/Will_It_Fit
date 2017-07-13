@@ -20,7 +20,7 @@ int CheckSizeOfSampleInformation(char SamplesFileLocation[256]) {
 }
 
 /// Import sample information
-void ImportSampleInformation(struct Dataset * Data, double * VolumesOfMolecules, char SamplesFileLocation[256], int NumberOfSampleInformations, int NumberOfSpectra)
+void ImportSampleInformation(struct Dataset * Data, double * VolumesOfMolecules, char SamplesFileLocation[256], int NumberOfSampleInformations, int NumberOfSpectra, struct Protein *ProteinStructure)
 {
     /// Declarations
     // Dummy variables used in function
@@ -33,8 +33,8 @@ void ImportSampleInformation(struct Dataset * Data, double * VolumesOfMolecules,
     double ScatteringLengthsNeutrons100[NumberOfSampleInformations];
     double ScatteringLengthsNeutrons0[NumberOfSampleInformations];
     double ScatteringLengthsXrays[NumberOfSampleInformations];
-    char Dummy[2 + 4 * (NumberOfSampleInformations + 2)][128];
-
+    char Dummy[2 + 6 * (NumberOfSampleInformations + 2)][228];
+    char ModificationName[4];
     /// I/O
     // Variables describing the file
     FILE *fp;
@@ -62,11 +62,19 @@ void ImportSampleInformation(struct Dataset * Data, double * VolumesOfMolecules,
         ScatteringLengthsNeutrons100[i] = atof(Dummy[5 + NumberOfSampleInformations + i]);
         ScatteringLengthsNeutrons0[i]   = atof(Dummy[7 + 2 * NumberOfSampleInformations + i]);
         ScatteringLengthsXrays[i]       = atof(Dummy[9 + 3 * NumberOfSampleInformations + i]);
+        ModificationName[0]       = Dummy[11 + 4 * NumberOfSampleInformations + i][0];
+        ModificationName[1]       = Dummy[11 + 4 * NumberOfSampleInformations + i][1];
+        ModificationName[2]       = Dummy[11 + 4 * NumberOfSampleInformations + i][2];
+    	//printf("%s\n",Dummy[11 + 4 * NumberOfSampleInformations + i]);
     }
 
     // Close file and dump values into ScatteringLengths and VolumesOfMolecules
     fclose(fp);
 
+
+
+    strcpy(ProteinStructure->ModificationName , ModificationName);
+    printf("Looking for modification %s\n", ProteinStructure->ModificationName);
     /// Compute scattering lengths for the various contrasts
     for (i = 0; i < NumberOfSpectra; ++i) {
 

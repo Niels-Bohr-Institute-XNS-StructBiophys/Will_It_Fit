@@ -110,6 +110,7 @@ int main(int argc, char *argv[])
     // Variables describing the sample info
     char SamplesFileLocation[256];
     char PDBFileLocation[256];
+    char ResultsDirectory[256];
 
     int NumberOfSampleInformations;
     double * VolumesOfMolecules;
@@ -218,7 +219,6 @@ int main(int argc, char *argv[])
         Initialize1DArray(&Data[i].ScatteringLengths, NumberOfSampleInformations);
     }
 
-    ImportSampleInformation(Data, VolumesOfMolecules, SamplesFileLocation, NumberOfSampleInformations, NumberOfSpectra);
 
     /// Import the PDB-file
     ProteinStructure.NumberOfAtoms = 0;
@@ -238,11 +238,15 @@ int main(int argc, char *argv[])
         printf("Found %d atoms distributed amongst %d residues. \n", ProteinStructure.NumberOfAtoms, ProteinStructure.NumberOfResidues);
 
         AllocateProteinStructure(&ProteinStructure, ProteinStructure.NumberOfResidues, ProteinStructure.NumberOfAtoms);
+    }
 
+    ImportSampleInformation(Data, VolumesOfMolecules, SamplesFileLocation, NumberOfSampleInformations, NumberOfSpectra, &ProteinStructure);
+
+   if (strcmp(PDBFileLocation, "N/A") != 0) {
         ImportResiduesFromPDBFile(PDBFileLocation, ProteinStructure, ProteinStructure.NumberOfResidues);
         ImportAtomsFromPDBFile(PDBFileLocation, ProteinStructure, ProteinStructure.NumberOfAtoms);
     }
-
+   //OutputStructure(ProteinStructure);
     /// Decide fitting range and initialize the userdefined structure
     printf("\n");
     ClearScreen();
@@ -328,10 +332,14 @@ int main(int argc, char *argv[])
     /// Output data and parameters
     printf("\n");
     ClearScreen();
+    //Create directory for output
+    //This might be platform specific
+    sprintf(ResultsDirectory, "%s-results", CardFileLocation);
+    //mkdir(ResultsDirectory, 0700);
 
-    OutputData(ChiSquare, QMin, QMax, Parameters, NumberOfParameters, Data, NumberOfSpectra, CardFileLocation, ProteinStructure, UserDefinedStructure, SamplesFileLocation);
-    OutputSpectra(Data, NumberOfSpectra);
-    OutputParameters(Parameters, NumberOfParameters, ChooseFittingRoutine, ChiSquare);
+    OutputData(ChiSquare, QMin, QMax, Parameters, NumberOfParameters, Data, NumberOfSpectra, CardFileLocation, ProteinStructure, UserDefinedStructure, SamplesFileLocation, ResultsDirectory);
+    OutputSpectra(Data, NumberOfSpectra, ResultsDirectory);
+    OutputParameters(Parameters, NumberOfParameters, ChooseFittingRoutine, ChiSquare, ResultsDirectory);
 
     /// Conclusion
     printf("\n");

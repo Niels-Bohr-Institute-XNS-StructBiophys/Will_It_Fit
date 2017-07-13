@@ -1,4 +1,4 @@
-void OutputSpectra(struct Dataset * Data, int NumberOfSpectra)
+void OutputSpectra(struct Dataset * Data, int NumberOfSpectra, char *ResultsDirectory)
 {
     // Dummy variables used in function
     int i;
@@ -9,12 +9,14 @@ void OutputSpectra(struct Dataset * Data, int NumberOfSpectra)
     FILE *Outputfile;
     char Filename[256];
 
+
     // Begin outputting data
     for(i = 0; i < NumberOfSpectra; ++i){
 
         // Output dummy data
-        sprintf(Filename, ".data/dat%d.dat", i + 1);
+        sprintf(Filename, "%s/dat%d.dat",ResultsDirectory, i + 1);
 
+        printf("%s\n", Filename);
         Outputfile = fopen(Filename, "w+");
 
         fprintf(Outputfile, "Datafile   = %s \n", Data[i].Filename);
@@ -28,7 +30,7 @@ void OutputSpectra(struct Dataset * Data, int NumberOfSpectra)
         fclose(Outputfile);
 
         // Output dummy fitting data
-        sprintf(Filename, ".data/fit%ds.dat", i + 1);
+        sprintf(Filename, "%s/fit%ds.dat",ResultsDirectory, i + 1);
 
         Outputfile = fopen(Filename, "w+");
 
