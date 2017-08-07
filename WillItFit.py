@@ -788,6 +788,7 @@ class MainCls(wx.Frame):
         ProcessToCall.append('-d=%s' % PDBStr)
         ProcessToCall.append('-h=%s' % ChiSquareFractile)
         ProcessToCall.append('-a=%d' % FittingRoutineArgument3)
+        ProcessToCall.append('-z=%d' % 0) #Set WIF to py mode as opposed to CMD mode.
 
         Process = subprocess.Popen(ProcessToCall)
         BusyDialog = WaitingDialog("WillItFit is running...", "Will it fit...?", Process)

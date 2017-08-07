@@ -4,7 +4,7 @@ Welcome to WillItFit(WIF) bash edition
  
 This branch of WIF offers to following functionality:
  
-Fits can only be performed on one model and with only one fitting routine. The default model is that of a nanodisc and the default fitting routine is the Levenberg-Marquardt algorithm.
+Fits can only be performed on one model and with only one fitting routine. The default model is that of a nanodisc and the supported fitting routine is the Levenberg-Marquardt algorithm.
  
 This reduction in functionality reduces the amount of arguments that is passed when calling the c part of WIF, which makes it easier to call in bash mode.
  
@@ -20,9 +20,11 @@ All call to WIF takes the following arguments:
 	-t Number of steps for fitting routine (When using resolution files)
 	-e path to Resolution file
 	-d path to PDB file
+	-r choose between computing the model or running the LM algorithm
  
 To call WIF in bash mode, the first must be compiled first. The following is an example a command used to compile WillItFit.c:
- 
+
+gcc WillItFit.c -o wifcmd.com -O3 -lm -lgsl -lgslcblas
  
 The compiled file can now be called:
  
