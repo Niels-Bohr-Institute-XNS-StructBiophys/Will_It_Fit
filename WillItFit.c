@@ -125,8 +125,8 @@ int main(int argc, char *argv[])
     int NumberOfFreeParameters = 0;
 
     // Variables describing the properties of the fit
-    double QMin;
-    double QMax;
+    double QMin = 0.0;
+    double QMax = 1.0;
     double DeltaForDifferentiations = 0.001;
     double ChiSquare;
     double ChiSquareFractile;
@@ -148,14 +148,19 @@ int main(int argc, char *argv[])
 
     bool IncludeResolutionEffects = false;
 
-    /// Setup errorchecking
-    ReturnMessage("Program terminated before error catching.");
+    // Variable describing program mode cmd or py
+    bool CMD = true;    
 
     /// Obtain arguments from program or request them in console
     AssignArguments(argc, argv, CardFileLocation, SamplesFileLocation, ParameterFileLocation, &QMin, &QMax, &ChooseFittingRoutine,
                     &FittingRoutineArgument2, &IncludeResolutionEffects, &NumberOfSmearingFolds, ResolutionFileLocation,
-                    &PrintCovarianceMatrix, PDBFileLocation, &ChiSquareFractile, &FittingRoutineArgument3);
+                    &PrintCovarianceMatrix, PDBFileLocation, &ChiSquareFractile, &FittingRoutineArgument3, &CMD);
 
+    /// Setup errorchecking
+    if(!CMD){
+        ReturnMessage("Program terminated before error catching.");
+    }
+    
     /// Retrieve parameters
     printf("\n");
     printf("Reading initial values of parameters. \n");
@@ -181,7 +186,7 @@ int main(int argc, char *argv[])
     printf("\n");
     ClearScreen();
 
-    HighestNumberOfDatapoints = CheckSizeOfData(CardFileLocation, &NumberOfSpectra);
+    HighestNumberOfDatapoints = CheckSizeOfData(CardFileLocation, &NumberOfSpectra, CMD);
     Errorcheck(HighestNumberOfDatapoints, "reading the datafiles");
 
     AllocateData(&Data, NumberOfSpectra);
@@ -198,7 +203,7 @@ int main(int argc, char *argv[])
         Data[i].IncludeResolutionEffects = false;
     }
 
-    ImportSpectra(Data, CardFileLocation, NumberOfSpectra);
+    ImportSpectra(Data, CardFileLocation, NumberOfSpectra, CMD);
 
     for (i = 0; i < NumberOfSpectra; ++i) {
         TotalNumberOfDatapoints += Data[i].NumberOfDatapoints;
@@ -241,6 +246,7 @@ int main(int argc, char *argv[])
     }
 
     ImportSampleInformation(Data, VolumesOfMolecules, SamplesFileLocation, NumberOfSampleInformations, NumberOfSpectra, &ProteinStructure);
+    printf("****  %s\n",ProteinStructure.ModificationName);
 
    if (strcmp(PDBFileLocation, "N/A") != 0) {
         ImportResiduesFromPDBFile(PDBFileLocation, ProteinStructure, ProteinStructure.NumberOfResidues);
@@ -382,7 +388,9 @@ int main(int argc, char *argv[])
 
     /// Return the chisquare if the algorithm executes correctly
     sprintf(Message, "%g", ChiSquare);
-    ReturnMessage(Message);
+    if(!CMD){
+        ReturnMessage(Message);
+    }
 
     return 0;
 }

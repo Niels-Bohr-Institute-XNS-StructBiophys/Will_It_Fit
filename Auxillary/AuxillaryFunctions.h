@@ -78,7 +78,7 @@ void AssignFittingRanges(struct Dataset * Data, double QMin, double QMax, int Nu
 void AssignArgumentsBash(int NumberOfArguments, char *Arguments[], char CardFileLocation[256], char SamplesFileLocation[256], char ParameterFileLocation[256],
                      double *QMin, double *QMax,
                      bool *IncludeResolutionEffects, int *NumberOfSmearingFolds, char ResolutionFileLocation[256],
-                     char PDBFileLocation[256], int *ComputeModel)
+                     char PDBFileLocation[256], int *ComputeModel, bool *CMD)
 {
     // Declarations
     int i;
@@ -134,10 +134,13 @@ void AssignArgumentsBash(int NumberOfArguments, char *Arguments[], char CardFile
             case 'd':
                 sprintf(PDBFileLocation, "%s", Argument);
             break;
-	   // Will we fit or compute model? 
-	    case 'f':
+	       // Will we fit or compute model? 
+	        case 'f':
                *ComputeModel = atoi(Argument);
             break;
+            case 'z':
+                *CMD = atoi;
+                printf("CMD is %d \n", *CMD);
 
             // Unknown argument
             default:
@@ -149,7 +152,7 @@ void AssignArgumentsBash(int NumberOfArguments, char *Arguments[], char CardFile
 void AssignArguments(int NumberOfArguments, char *Arguments[], char CardFileLocation[256], char SamplesFileLocation[256], char ParameterFileLocation[256],
                      double *QMin, double *QMax, int *ChooseFittingRoutine, int *FittingRoutineArgument2,
                      bool *IncludeResolutionEffects, int *NumberOfSmearingFolds, char ResolutionFileLocation[256], bool *PrintCorrelationMatrix,
-                     char PDBFileLocation[256], double *ChiSquareFractile, int *FittingRoutineArgument3)
+                     char PDBFileLocation[256], double *ChiSquareFractile, int *FittingRoutineArgument3, bool * CMD)
 {
     // Declarations
     int i;
@@ -232,10 +235,39 @@ void AssignArguments(int NumberOfArguments, char *Arguments[], char CardFileLoca
                 *FittingRoutineArgument3 = atoi(Argument);
             break;
 
+            case 'z':
+                *CMD = atoi(Argument);
+                printf("CMD is %d\n", *CMD);
+            break;
             // Unknown argument
             default:
                 printf("Unknown arguments passed to algorithm! \n");
             break;
         }
     }
+}
+
+void DirectoryFinder(char FileLocation[256], char Directory[256]){
+    int length;
+    int i;
+    int j;
+    char curr;
+    char check = '/';
+    //loop backwards through FileLocation string to find the end of the directory
+    length = strlen(FileLocation);
+    for (i= length -1; i >= 0; --i)
+    {
+        curr = FileLocation[i];
+        if(curr == check)
+        {
+            break;
+        }
+    }
+    //Second loop assigns characters in the directory string
+    for(j = 0; j <= i; ++j)
+    {
+        Directory[j] = FileLocation[j];
+    }
+
+
 }
