@@ -11,6 +11,9 @@ int CheckSizeOfData(char CardFileLocation[256], int *NumberOfSpectra, bool CMD)
     int PointsInCurrentSpectrum;
     int MostPointsInASpectrum = 0;
 
+    //Is the .rad files located in a subdirectory
+    bool SubDir; 
+
     char Buffer[128];
     char Directory[256];
     int linenum;
@@ -29,10 +32,9 @@ int CheckSizeOfData(char CardFileLocation[256], int *NumberOfSpectra, bool CMD)
     }
 
     printf(".card-file found!\n");
-    printf("%s\n", CardFileLocation);
     if(CMD)
     {
-        DirectoryFinder(CardFileLocation, Directory);
+       SubDir = DirectoryFinder(CardFileLocation, Directory);
     }
     // Write the data and names into dummy variable
     linenum = 0;
@@ -50,14 +52,14 @@ int CheckSizeOfData(char CardFileLocation[256], int *NumberOfSpectra, bool CMD)
 
     /// Begin reading from .rad-files
     for (i = 0; i < NumberOfDatasetsDummy; ++i) {
-        if(CMD){
+        if(CMD && SubDir){
             sprintf(Path, "%s%s",Directory, Dummy[2 + i * 6]);
         }
         else{
-           sprintf(Path, "%s", Dummy[2 + i * 6]); 
+            sprintf(Path, "%s", Dummy[2 + i * 6]); 
         }
-        printf("%s\n", Path);
         fp = fopen(Path,"r");
+        printf("Opening: %s \n", Path);
         if(fp == NULL){
             printf("An error occured when attempting to open the .rad-files. \n");
             return -1;
@@ -101,6 +103,8 @@ void ImportSpectra(struct Dataset * Data, char CardFileLocation[256], int Number
     double Dummy2;
     double Dummy3;
     double Dummy4;
+    //Is the .rad files located in a subdirectory
+    bool SubDir; 
 
     char Buffer[128];
     char Directory[256];
@@ -126,7 +130,7 @@ void ImportSpectra(struct Dataset * Data, char CardFileLocation[256], int Number
     }
     if(CMD)
     {
-        DirectoryFinder(CardFileLocation, Directory);
+        SubDir = DirectoryFinder(CardFileLocation, Directory);
     }
     // Write the data and names into dummy variable
     linenum = 0;
@@ -142,7 +146,7 @@ void ImportSpectra(struct Dataset * Data, char CardFileLocation[256], int Number
     /// Begin reading from .rad-files
     for (i = 0; i < NumberOfSpectra; ++i) {
         // Prepare .rad-file
-        if(CMD){
+        if(CMD && SubDir){
             sprintf(Path, "%s%s",Directory, Dummy[2 + i * 6]);
         }
         else{
@@ -159,7 +163,7 @@ void ImportSpectra(struct Dataset * Data, char CardFileLocation[256], int Number
             printf("An error occured when attempting to open the .rad-files. \n");
             return;
         }
-
+        printf("%s\n", Path);
         // Read lines into dummy variables
         linenum = 0;
 

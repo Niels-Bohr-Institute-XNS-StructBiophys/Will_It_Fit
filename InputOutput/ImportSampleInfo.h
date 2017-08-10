@@ -40,7 +40,7 @@ void ImportSampleInformation(struct Dataset * Data, double * VolumesOfMolecules,
     FILE *fp;
 
     // Open file
-    printf("Loading samples file. \n");
+    printf("Loading samples file %s. \n", SamplesFileLocation);
 
     fp = fopen(SamplesFileLocation, "r");
 

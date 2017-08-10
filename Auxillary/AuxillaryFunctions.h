@@ -247,12 +247,13 @@ void AssignArguments(int NumberOfArguments, char *Arguments[], char CardFileLoca
     }
 }
 
-void DirectoryFinder(char FileLocation[256], char Directory[256]){
+bool DirectoryFinder(char FileLocation[256], char Directory[256]){
     int length;
     int i;
     int j;
     char curr;
     char check = '/';
+    bool found = false;
     //loop backwards through FileLocation string to find the end of the directory
     length = strlen(FileLocation);
     for (i= length -1; i >= 0; --i)
@@ -260,14 +261,16 @@ void DirectoryFinder(char FileLocation[256], char Directory[256]){
         curr = FileLocation[i];
         if(curr == check)
         {
+            found = true;
             break;
         }
     }
-    //Second loop assigns characters in the directory string
-    for(j = 0; j <= i; ++j)
-    {
-        Directory[j] = FileLocation[j];
+    if(found){
+        //Second loop assigns characters in the directory string
+        for(j = 0; j <= i; ++j)
+        {
+            Directory[j] = FileLocation[j];
+        }
     }
-
-
+    return found;
 }
