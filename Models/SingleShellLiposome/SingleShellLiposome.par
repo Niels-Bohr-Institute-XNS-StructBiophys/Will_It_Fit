@@ -1,0 +1,16 @@
+0.90	1.00	1.10	1	ScaleN100    	
+0.90	1.00	1.10	1	ScaleN0
+0.90	1.00	1.10	1	ScaleX	  
+0.00	0.00	10.0	1	WaterAtHeads		
+0.00	500.00	1000.0  1	Radius
+0.90	1.00	1.10	1	CVOfLipids
+0.90	1.00	1.10	1	CVOfWater
+0.001	0.20	0.50	1	SigmaR
+-1.00	0.00	1.00    1	BackN100	  	
+-1.00	0.00	1.00	1	BackN0	
+-1.00	0.00	1.00    1	BackX
+0.90	1.00	1.10    1	CVOfWater
+0.00	2.00	10.00	1	XRoughness
+0.00	4.00	10.00	1	NRoughness
+0.90	1.00	1.10	1	ScaleConcentration
+20.00	30.00	40.00	1	ThicknessOfShell

@@ -1,4 +1,4 @@
-void OutputParameters(struct Parameter * Parameters, int NumberOfParameters, int ChooseFittingRoutine, double ChiSquare, char * ResultsDirectory)
+void OutputParameters(struct Parameter * Parameters, int NumberOfParameters, int ChooseFittingRoutine, double ChiSquare)
 {
     /// Declarations
     int i;
@@ -8,10 +8,7 @@ void OutputParameters(struct Parameter * Parameters, int NumberOfParameters, int
 
     /// Print to file
     //Create the output file
-    char Filename[256];
-
-    sprintf(Filename, "%s/ParametersAfter.mcp", ResultsDirectory);
-    fp = fopen(Filename, "w+");
+    fp = fopen("ParametersAfter.mcp", "w+");
 
     // Print parameters and properties of parameters to file
     for(i = 0; i < NumberOfParameters; ++i){

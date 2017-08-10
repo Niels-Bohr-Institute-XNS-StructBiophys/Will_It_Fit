@@ -1,0 +1,11 @@
+0.90	1.00	1.10	1	ScaleN100    	
+0.90	1.00	1.10	1	ScaleN0
+0.90	1.00	1.10	1	ScaleX		  		
+0.00	200.0	1000.0  1	Radius
+-1.00	0.00	1.00    1	BackN100	  	
+-1.00	0.00	1.00	1	BackN0	
+-1.00	0.00	1.00    1	BackX
+0.00	2.00	8.00	1	XRoughness
+0.00	2.00	8.00	1	NRoughness
+0.90	1.00	1.10	1	ScaleConcentration
+0.01	0.10	1.00	1	Polydispersity

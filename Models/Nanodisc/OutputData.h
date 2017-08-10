@@ -1,6 +1,6 @@
 void OutputData(double ChiSquare, double QMin, double QMax, struct Parameter * Parameters, int NumberOfParameters,
-                struct Dataset * Data, int NumberOfSpectra, char cardfilename[128], struct Protein ProteinStructure,
-                struct UserDefined UserDefinedStructure, char SampleFilename[256], char *ResultsDirectory)
+                struct Dataset * Data, int NumberOfSpectra, char cardfilename[128], struct Protein ProteinStructure, 
+                struct UserDefined UserDefinedStructure, char SampleFilename[256])
 {
     /// Declarations
     // Declare dummy variables used in function

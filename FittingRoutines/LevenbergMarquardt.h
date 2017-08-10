@@ -90,5 +90,6 @@ int LevenbergMarquardt(struct Dataset * Data, int NumberOfSpectra, struct Parame
     free(Beta);
     Free2DArray(CovarianceMatrix, NumberOfParameters);
     Free2DArray(AlphaMatrix, NumberOfParameters);
+
     return 0;
 }

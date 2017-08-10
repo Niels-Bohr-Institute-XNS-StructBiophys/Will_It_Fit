@@ -75,84 +75,10 @@ void AssignFittingRanges(struct Dataset * Data, double QMin, double QMax, int Nu
 }
 
 /// Function used to assign arguments from the console to the appropriate variables
-void AssignArgumentsBash(int NumberOfArguments, char *Arguments[], char CardFileLocation[256], char SamplesFileLocation[256], char ParameterFileLocation[256],
-                     double *QMin, double *QMax,
-                     bool *IncludeResolutionEffects, int *NumberOfSmearingFolds, char ResolutionFileLocation[256],
-                     char PDBFileLocation[256], int *ComputeModel, bool *CMD)
-{
-    // Declarations
-    int i;
-
-    char Category;
-    char Argument[256];
-
-    // Main loop
-    for (i = 1; i < NumberOfArguments; ++i) {
-
-        // Scan and assign
-        sscanf(Arguments[i], "-%c=%s", &Category, Argument);
-
-        switch (Category) {
-
-            // .card-file location
-            case 'c':
-                sprintf(CardFileLocation, "%s", Argument);
-            break;
-
-            // Samples file location
-            case 's':
-                sprintf(SamplesFileLocation, "%s", Argument);
-            break;
-
-            // Parameter file location
-            case 'p':
-                sprintf(ParameterFileLocation, "%s", Argument);
-            break;
-
-            // Fitting range
-            case 'n':
-                *QMin = atof(Argument);
-            break;
-
-            case 'x':
-                *QMax = atof(Argument);
-            break;
-
-            // Obtain resolution information
-            case 't':
-                if (atoi(Argument) != 0) {
-                    *IncludeResolutionEffects = true;
-                    *NumberOfSmearingFolds = atoi(Argument);
-                }
-            break;
-
-            case 'e':
-                sprintf(ResolutionFileLocation, "%s", Argument);
-            break;
-
-            // .pdb-file location
-            case 'd':
-                sprintf(PDBFileLocation, "%s", Argument);
-            break;
-	       // Will we fit or compute model? 
-	        case 'f':
-               *ComputeModel = atoi(Argument);
-            break;
-            case 'z':
-                *CMD = atoi;
-                printf("CMD is %d \n", *CMD);
-
-            // Unknown argument
-            default:
-                printf("Unknown arguments passed to algorithm! \n");
-            break;
-        }
-    }
-}
 void AssignArguments(int NumberOfArguments, char *Arguments[], char CardFileLocation[256], char SamplesFileLocation[256], char ParameterFileLocation[256],
                      double *QMin, double *QMax, int *ChooseFittingRoutine, int *FittingRoutineArgument2,
                      bool *IncludeResolutionEffects, int *NumberOfSmearingFolds, char ResolutionFileLocation[256], bool *PrintCorrelationMatrix,
-                     char PDBFileLocation[256], double *ChiSquareFractile, int *FittingRoutineArgument3, bool * CMD)
+                     char PDBFileLocation[256], double *ChiSquareFractile, int *FittingRoutineArgument3)
 {
     // Declarations
     int i;
@@ -235,39 +161,10 @@ void AssignArguments(int NumberOfArguments, char *Arguments[], char CardFileLoca
                 *FittingRoutineArgument3 = atoi(Argument);
             break;
 
-            case 'z':
-                *CMD = atoi(Argument);
-                printf("CMD is %d\n", *CMD);
-            break;
             // Unknown argument
             default:
                 printf("Unknown arguments passed to algorithm! \n");
             break;
         }
     }
-}
-
-void DirectoryFinder(char FileLocation[256], char Directory[256]){
-    int length;
-    int i;
-    int j;
-    char curr;
-    char check = '/';
-    //loop backwards through FileLocation string to find the end of the directory
-    length = strlen(FileLocation);
-    for (i= length -1; i >= 0; --i)
-    {
-        curr = FileLocation[i];
-        if(curr == check)
-        {
-            break;
-        }
-    }
-    //Second loop assigns characters in the directory string
-    for(j = 0; j <= i; ++j)
-    {
-        Directory[j] = FileLocation[j];
-    }
-
-
 }

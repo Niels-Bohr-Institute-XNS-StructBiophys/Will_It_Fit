@@ -16,7 +16,7 @@ int CheckNumberOfParameters(char ParameterFileLocation[256])
 
     // Open file and read parameters
     printf("Loading parameter file. \n");
-    printf("%s\n", ParameterFileLocation);
+
     ParameterFile = fopen(ParameterFileLocation, "r");
 
     if (ParameterFile == NULL){

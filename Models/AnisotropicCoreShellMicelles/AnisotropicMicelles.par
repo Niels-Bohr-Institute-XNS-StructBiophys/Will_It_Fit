@@ -1,0 +1,17 @@
+0.90	1.00	1.10	1	ScaleN100    	
+0.90	1.00	1.10	1	ScaleN0
+0.90	1.00	1.10	1	ScaleX	  
+0.01	2.00	10.0	1	NumberOfWaterAtHead		
+0.90	1.00	1.10    1	CVOfHeads
+0.90	1.00	1.10	1	CVOfTails
+0.90	1.00	1.10	1	CVOfWater
+8.00	15.0	20.0	1	MinorRadiusOfCore
+-1.00	0.00	1.00    1	BackN100	  	
+-1.00	0.00	1.00	1	BackN0	
+-1.00	0.00	1.00    1	BackX
+0.50	1.00	3.00	1	AxisRatioOfCore
+0.00	2.00	8.00	1	XRoughnessShell
+0.00	2.00	8.00	1	XRoughnessCore
+0.00	2.00	8.00	1	NRoughnessShell
+0.00	2.00	8.00	1	NRoughnessCore
+0.90	1.00	1.10	1	ScaleConcentration

@@ -110,7 +110,6 @@ int main(int argc, char *argv[])
     // Variables describing the sample info
     char SamplesFileLocation[256];
     char PDBFileLocation[256];
-    char ResultsDirectory[256];
 
     int NumberOfSampleInformations;
     double * VolumesOfMolecules;
@@ -125,8 +124,8 @@ int main(int argc, char *argv[])
     int NumberOfFreeParameters = 0;
 
     // Variables describing the properties of the fit
-    double QMin = 0.0;
-    double QMax = 1.0;
+    double QMin;
+    double QMax;
     double DeltaForDifferentiations = 0.001;
     double ChiSquare;
     double ChiSquareFractile;
@@ -148,19 +147,14 @@ int main(int argc, char *argv[])
 
     bool IncludeResolutionEffects = false;
 
-    // Variable describing program mode cmd or py
-    bool CMD = true;    
+    /// Setup errorchecking
+    ReturnMessage("Program terminated before error catching.");
 
     /// Obtain arguments from program or request them in console
     AssignArguments(argc, argv, CardFileLocation, SamplesFileLocation, ParameterFileLocation, &QMin, &QMax, &ChooseFittingRoutine,
                     &FittingRoutineArgument2, &IncludeResolutionEffects, &NumberOfSmearingFolds, ResolutionFileLocation,
-                    &PrintCovarianceMatrix, PDBFileLocation, &ChiSquareFractile, &FittingRoutineArgument3, &CMD);
+                    &PrintCovarianceMatrix, PDBFileLocation, &ChiSquareFractile, &FittingRoutineArgument3);
 
-    /// Setup errorchecking
-    if(!CMD){
-        ReturnMessage("Program terminated before error catching.");
-    }
-    
     /// Retrieve parameters
     printf("\n");
     printf("Reading initial values of parameters. \n");
@@ -186,7 +180,7 @@ int main(int argc, char *argv[])
     printf("\n");
     ClearScreen();
 
-    HighestNumberOfDatapoints = CheckSizeOfData(CardFileLocation, &NumberOfSpectra, CMD);
+    HighestNumberOfDatapoints = CheckSizeOfData(CardFileLocation, &NumberOfSpectra);
     Errorcheck(HighestNumberOfDatapoints, "reading the datafiles");
 
     AllocateData(&Data, NumberOfSpectra);
@@ -203,7 +197,7 @@ int main(int argc, char *argv[])
         Data[i].IncludeResolutionEffects = false;
     }
 
-    ImportSpectra(Data, CardFileLocation, NumberOfSpectra, CMD);
+    ImportSpectra(Data, CardFileLocation, NumberOfSpectra);
 
     for (i = 0; i < NumberOfSpectra; ++i) {
         TotalNumberOfDatapoints += Data[i].NumberOfDatapoints;
@@ -224,6 +218,7 @@ int main(int argc, char *argv[])
         Initialize1DArray(&Data[i].ScatteringLengths, NumberOfSampleInformations);
     }
 
+    ImportSampleInformation(Data, VolumesOfMolecules, SamplesFileLocation, NumberOfSampleInformations, NumberOfSpectra);
 
     /// Import the PDB-file
     ProteinStructure.NumberOfAtoms = 0;
@@ -243,16 +238,11 @@ int main(int argc, char *argv[])
         printf("Found %d atoms distributed amongst %d residues. \n", ProteinStructure.NumberOfAtoms, ProteinStructure.NumberOfResidues);
 
         AllocateProteinStructure(&ProteinStructure, ProteinStructure.NumberOfResidues, ProteinStructure.NumberOfAtoms);
-    }
 
-    ImportSampleInformation(Data, VolumesOfMolecules, SamplesFileLocation, NumberOfSampleInformations, NumberOfSpectra, &ProteinStructure);
-    printf("****  %s\n",ProteinStructure.ModificationName);
-
-   if (strcmp(PDBFileLocation, "N/A") != 0) {
         ImportResiduesFromPDBFile(PDBFileLocation, ProteinStructure, ProteinStructure.NumberOfResidues);
         ImportAtomsFromPDBFile(PDBFileLocation, ProteinStructure, ProteinStructure.NumberOfAtoms);
     }
-   //OutputStructure(ProteinStructure);
+
     /// Decide fitting range and initialize the userdefined structure
     printf("\n");
     ClearScreen();
@@ -338,14 +328,10 @@ int main(int argc, char *argv[])
     /// Output data and parameters
     printf("\n");
     ClearScreen();
-    //Create directory for output
-    //This might be platform specific
-    sprintf(ResultsDirectory, "%s-results", CardFileLocation);
-    //mkdir(ResultsDirectory, 0700);
 
-    OutputData(ChiSquare, QMin, QMax, Parameters, NumberOfParameters, Data, NumberOfSpectra, CardFileLocation, ProteinStructure, UserDefinedStructure, SamplesFileLocation, ResultsDirectory);
-    OutputSpectra(Data, NumberOfSpectra, ResultsDirectory);
-    OutputParameters(Parameters, NumberOfParameters, ChooseFittingRoutine, ChiSquare, ResultsDirectory);
+    OutputData(ChiSquare, QMin, QMax, Parameters, NumberOfParameters, Data, NumberOfSpectra, CardFileLocation, ProteinStructure, UserDefinedStructure, SamplesFileLocation);
+    OutputSpectra(Data, NumberOfSpectra);
+    OutputParameters(Parameters, NumberOfParameters, ChooseFittingRoutine, ChiSquare);
 
     /// Conclusion
     printf("\n");
@@ -388,9 +374,7 @@ int main(int argc, char *argv[])
 
     /// Return the chisquare if the algorithm executes correctly
     sprintf(Message, "%g", ChiSquare);
-    if(!CMD){
-        ReturnMessage(Message);
-    }
+    ReturnMessage(Message);
 
     return 0;
 }
