@@ -1,4 +1,4 @@
-void OutputData(double ChiSquare, double QMin, double QMax, struct Parameter * Parameters, int NumberOfParameters,
+void OutputData(double ChiSquare, double ChiSquareRed, double QMin, double QMax, struct Parameter * Parameters, int NumberOfParameters,
                 struct Dataset * Data, int NumberOfSpectra, char cardfilename[128], struct Protein ProteinStructure, 
                 struct UserDefined UserDefinedStructure, char SampleFilename[256])
 {
@@ -37,6 +37,7 @@ void OutputData(double ChiSquare, double QMin, double QMax, struct Parameter * P
 
     // Print fit quality to file
     fprintf(fp, "Final chisq = %g \n", ChiSquare);
+    fprintf(fp, "Final chisqred = %g \n", ChiSquareRed);
 
     fprintf(fp, "\n");
 

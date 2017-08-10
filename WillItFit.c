@@ -128,6 +128,7 @@ int main(int argc, char *argv[])
     double QMax;
     double DeltaForDifferentiations = 0.001;
     double ChiSquare;
+    double ChiSquareRed;
     double ChiSquareFractile;
 
     int ChooseFittingRoutine = 0;
@@ -137,7 +138,7 @@ int main(int argc, char *argv[])
     int FittingRoutineError = -1;
 
     bool PrintCovarianceMatrix = false;
-    char Message[64];
+    char Message[256];
 
     // Variables describing the resolution
     char ResolutionFileLocation[256];
@@ -270,53 +271,53 @@ int main(int argc, char *argv[])
 
     switch (ChooseFittingRoutine) {
         case 0:
-            FittingRoutineError = ComputeModel(Data, NumberOfSpectra, Parameters, NumberOfParameters, &ChiSquare, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure,
+            FittingRoutineError = ComputeModel(Data, NumberOfSpectra, Parameters, NumberOfParameters, &ChiSquareRed, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure,
                                                &UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
         break;
 
         case 1:
-            FittingRoutineError = LevenbergMarquardt(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquare, NumberOfSmearingFolds,
+            FittingRoutineError = LevenbergMarquardt(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquareRed, NumberOfSmearingFolds,
                                                      VolumesOfMolecules, false, PrintCovarianceMatrix, ProteinStructure, &UserDefinedStructure, DeltaForDifferentiations,
                                                      NumberOfSampleInformations, TotalNumberOfDatapoints, NumberOfFreeParameters, HighestNumberOfDatapoints);
         break;
 
         case 2:
-            FittingRoutineError = GridsearchLM(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquare, NumberOfSmearingFolds,
+            FittingRoutineError = GridsearchLM(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquareRed, NumberOfSmearingFolds,
                                                VolumesOfMolecules, FittingRoutineArgument2, ProteinStructure, &UserDefinedStructure, DeltaForDifferentiations, true,
                                                NumberOfSampleInformations, TotalNumberOfDatapoints, NumberOfFreeParameters, HighestNumberOfDatapoints);
         break;
 
         case 3:
-            FittingRoutineError = BFGS(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquare, NumberOfSmearingFolds, VolumesOfMolecules,
+            FittingRoutineError = BFGS(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquareRed, NumberOfSmearingFolds, VolumesOfMolecules,
                                        ProteinStructure, &UserDefinedStructure, DeltaForDifferentiations, false, TotalNumberOfDatapoints, NumberOfFreeParameters);
         break;
 
         case 4:
-            FittingRoutineError = GridsearchBFGS(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquare, NumberOfSmearingFolds,
+            FittingRoutineError = GridsearchBFGS(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquareRed, NumberOfSmearingFolds,
                                                  VolumesOfMolecules, FittingRoutineArgument2, ProteinStructure, &UserDefinedStructure, DeltaForDifferentiations, true,
                                                  TotalNumberOfDatapoints, NumberOfFreeParameters);
         break;
 
         case 5:
-            FittingRoutineError = Swarm(Data, NumberOfSpectra, Parameters, NumberOfParameters, &ChiSquare, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure,
+            FittingRoutineError = Swarm(Data, NumberOfSpectra, Parameters, NumberOfParameters, &ChiSquareRed, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure,
                                         &UserDefinedStructure, FittingRoutineArgument3, FittingRoutineArgument2, FittingRoutineArgument1, false, HighestNumberOfDatapoints,
                                         NumberOfSampleInformations, TotalNumberOfDatapoints, NumberOfFreeParameters);
         break;
 
         case 6:
-            FittingRoutineError = Genetic(Data, NumberOfSpectra, Parameters, NumberOfParameters, &ChiSquare, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure,
+            FittingRoutineError = Genetic(Data, NumberOfSpectra, Parameters, NumberOfParameters, &ChiSquareRed, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure,
                                           &UserDefinedStructure, FittingRoutineArgument3, FittingRoutineArgument2, HighestNumberOfDatapoints, NumberOfSampleInformations,
                                           TotalNumberOfDatapoints, NumberOfFreeParameters);
         break;
 
         case 7:
-            FittingRoutineError = ProfileLikelihood(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquare, NumberOfSmearingFolds,
+            FittingRoutineError = ProfileLikelihood(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquareRed, NumberOfSmearingFolds,
                                                     VolumesOfMolecules, ProteinStructure, &UserDefinedStructure, DeltaForDifferentiations, ChiSquareFractile,  FittingRoutineArgument3,
                                                     CardFileLocation, NumberOfSampleInformations, TotalNumberOfDatapoints, NumberOfFreeParameters, HighestNumberOfDatapoints);
         break;
 
         case 8:
-            FittingRoutineError = ProfileLikelihoodSingleParameter(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquare, NumberOfSmearingFolds,
+            FittingRoutineError = ProfileLikelihoodSingleParameter(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquareRed, NumberOfSmearingFolds,
                                                                    VolumesOfMolecules, ProteinStructure, &UserDefinedStructure, DeltaForDifferentiations, ChiSquareFractile,
                                                                    FittingRoutineArgument3, CardFileLocation, FittingRoutineArgument2, NumberOfSampleInformations,
                                                                    TotalNumberOfDatapoints, NumberOfFreeParameters, HighestNumberOfDatapoints);
@@ -324,14 +325,15 @@ int main(int argc, char *argv[])
     }
 
     Errorcheck(FittingRoutineError, "running the selected fitting routine");
+    ChiSquare = (TotalNumberOfDatapoints - NumberOfFreeParameters)*ChiSquareRed;
 
     /// Output data and parameters
     printf("\n");
     ClearScreen();
 
-    OutputData(ChiSquare, QMin, QMax, Parameters, NumberOfParameters, Data, NumberOfSpectra, CardFileLocation, ProteinStructure, UserDefinedStructure, SamplesFileLocation);
+    OutputData(ChiSquare, ChiSquareRed, QMin, QMax, Parameters, NumberOfParameters, Data, NumberOfSpectra, CardFileLocation, ProteinStructure, UserDefinedStructure, SamplesFileLocation);
     OutputSpectra(Data, NumberOfSpectra);
-    OutputParameters(Parameters, NumberOfParameters, ChooseFittingRoutine, ChiSquare);
+    OutputParameters(Parameters, NumberOfParameters, ChooseFittingRoutine, ChiSquare, ChiSquareRed);
 
     /// Conclusion
     printf("\n");
@@ -373,7 +375,7 @@ int main(int argc, char *argv[])
     }
 
     /// Return the chisquare if the algorithm executes correctly
-    sprintf(Message, "%g", ChiSquare);
+    sprintf(Message, "%g and a reduced chisquare of %g", ChiSquare, ChiSquareRed);
     ReturnMessage(Message);
 
     return 0;

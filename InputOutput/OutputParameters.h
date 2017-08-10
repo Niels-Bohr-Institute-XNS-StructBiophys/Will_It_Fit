@@ -1,4 +1,4 @@
-void OutputParameters(struct Parameter * Parameters, int NumberOfParameters, int ChooseFittingRoutine, double ChiSquare)
+void OutputParameters(struct Parameter * Parameters, int NumberOfParameters, int ChooseFittingRoutine, double ChiSquare, double ChiSquareRed)
 {
     /// Declarations
     int i;
@@ -28,6 +28,7 @@ void OutputParameters(struct Parameter * Parameters, int NumberOfParameters, int
     /// Print to screen
     printf("Parameters: \n");
     printf("Final Chisquare = %g \n", ChiSquare);
+    printf("Reduced Chisquare = %g\n", ChiSquareRed);
     printf("\n");
 
     printf("                Value          Error          Name \n");
