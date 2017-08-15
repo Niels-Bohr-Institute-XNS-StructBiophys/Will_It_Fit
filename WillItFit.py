@@ -793,6 +793,7 @@ class MainCls(wx.Frame):
         ProcessToCall.append('-d=%s' % PDBStr)
         ProcessToCall.append('-h=%s' % ChiSquareFractile)
         ProcessToCall.append('-a=%d' % FittingRoutineArgument3)
+        ProcessToCall.append('-z=%d' % 0)
         print (ProcessToCall)
         print ("\n")
 

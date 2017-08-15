@@ -1,0 +1,24 @@
+#This is the ignore file for Will It Fit. #
+#The following is ignored#
+
+# Compiled source #
+###################
+*.com
+*.exe
+
+
+# Data and result files #
+##############
+*.card
+*.dat
+*.pdb
+*.par
+
+# Model location #
+##################
+Auxillary/ModelLocation.h
+Auxillary/ModelLocation.h~
+
+
+
+
