@@ -127,8 +127,8 @@ int main(int argc, char *argv[])
     int NumberOfFreeParameters = 0;
 
     // Variables describing the properties of the fit
-    double QMin;
-    double QMax;
+    double QMin = 0.;
+    double QMax = 1.;
     double DeltaForDifferentiations = 0.001;
     double ChiSquare;
     double ChiSquareRed;
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
     int FittingRoutineError = -1;
 
     bool PrintCovarianceMatrix = false;
-    bool CMD = false;
+    bool CMD = true;
     char Message[256];
 
     // Variables describing the resolution

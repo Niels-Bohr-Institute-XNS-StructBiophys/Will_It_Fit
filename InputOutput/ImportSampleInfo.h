@@ -62,6 +62,7 @@ void ImportSampleInformation(struct Dataset * Data, double * VolumesOfMolecules,
         ScatteringLengthsNeutrons100[i] = atof(Dummy[5 + NumberOfSampleInformations + i]);
         ScatteringLengthsNeutrons0[i]   = atof(Dummy[7 + 2 * NumberOfSampleInformations + i]);
         ScatteringLengthsXrays[i]       = atof(Dummy[9 + 3 * NumberOfSampleInformations + i]);
+
     }
 
     // Close file and dump values into ScatteringLengths and VolumesOfMolecules

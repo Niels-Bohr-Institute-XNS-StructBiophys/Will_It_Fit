@@ -219,7 +219,6 @@ void ComputeValueAndCovarianceMatrix(struct Dataset * Data, int NumberOfSpectra,
             Initialize1DArray(&Gradient, NumberOfParameters);
 
             Intensity = ComputeValue(q, j, i, DummyData, DummyParameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &UserDefinedCopy);
-
             Data[i].FitValues[j] = Intensity;
             DifferenceInIntensity = Data[i].IValues[j] - Intensity;
 
@@ -454,14 +453,14 @@ void RunLevenbergMarquardt(struct Dataset * Data, int NumberOfSpectra, struct Pa
 	GaussError = GaussJordanElimination(CovarianceMatrix, NumberOfParameters, ParameterStepsDummy);
 
 	if (GaussError < 0) {
-        printf("  ***************************************************************************\n");
+        /*printf("  ***************************************************************************\n");
         printf("  * Singularity in covariance matrix - unable to invert...                  *\n");
         printf("  * Perhaps the algorithm is trying to refine a parameter with no impact... *\n");
         printf("  ***************************************************************************\n\n");
 
         free(ParameterStepsDummy);
 		free(ParameterSteps);
-		free(DummyParameters);
+		free(DummyParameters);*/
 
 		return;
 	}

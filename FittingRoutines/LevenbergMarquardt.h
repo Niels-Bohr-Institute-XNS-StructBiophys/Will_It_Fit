@@ -47,7 +47,6 @@ int LevenbergMarquardt(struct Dataset * Data, int NumberOfSpectra, struct Parame
             for (j = 0; j < NumberOfParameters; ++j) {
                 printf("Parameter %2d = %15g          %s \n", j, Parameters[j].Value, Parameters[j].Name);
             }
-
             printf("\n");
         }
 
