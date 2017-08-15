@@ -38,12 +38,12 @@ import subprocess
 try:
     import wx
 except:
-    print ""
-    print "***********************************************************************"
-    print "* WillItFit failed to import wxPython - is it correctly installed...? *"
-    print "***********************************************************************"
-    print ""
-    print "Press Enter..."
+    print ("")
+    print ("***********************************************************************")
+    print ("* WillItFit failed to import wxPython - is it correctly installed...? *")
+    print ("***********************************************************************")
+    print ("")
+    print ("Press Enter...")
     raw_input()
     sys.exit(1)
 
@@ -53,12 +53,12 @@ import wx.lib.scrolledpanel
 try:
     import matplotlib 
 except:
-    print ""
-    print "*************************************************************************"
-    print "* WillItFit failed to import MatPlotLib - is it correctly installed...? *"
-    print "*************************************************************************"
-    print ""
-    print "Press Enter..."
+    print ("")
+    print ("*************************************************************************")
+    print ("* WillItFit failed to import MatPlotLib - is it correctly installed...? *")
+    print ("*************************************************************************")
+    print ("")
+    print ("Press Enter...")
     raw_input()
     sys.exit(1)
 
@@ -68,12 +68,12 @@ matplotlib.use('WXAgg')
 try:
     import pylab
 except:
-    print ""
-    print "********************************************************************"
-    print "* WillItFit failed to import PyLab - is it correctly installed...? *"
-    print "********************************************************************"
-    print ""
-    print "Press Enter..."
+    print ("")
+    print ("********************************************************************")
+    print ("* WillItFit failed to import PyLab - is it correctly installed...? *")
+    print ("********************************************************************")
+    print ("")
+    print ("Press Enter...")
     raw_input()
     sys.exit(1)
 
@@ -596,21 +596,22 @@ class MainCls(wx.Frame):
             CompilerCheck = -1
         
         if CompilerCheck == 0:
-            print ""
-            print ""
-            print ""
-            print "************************"
-            print "* Welcome to WillItFit *"
-            print "************************"
-            print ""
-            print "Found all necessary Python-libraries."
-            print "Found compiler: " + CompilerPath + "."
+            print ("")
+            print ("")
+            print ("")
+            print ("************************")
+            print ("* Welcome to WillItFit *")
+            print ("************************")
+            print ("")
+            print ("Found all necessary Python-libraries.")
+            print ("Found compiler: " + CompilerPath + ".")
         else:
             wx.MessageBox("Unable to locate the C-compiler specified in CompilerConfig.cfg. This compiler must be installed and correctly set up in order for WillItFit to work.", \
                           "No compiler found...!", wx.OK | wx.ICON_INFORMATION)
 
 ## Define function to be executed
     def ExecuteFnc(self, event):
+
         self.ClearOldData()
         os.mkdir('./.data/')
         
@@ -732,7 +733,7 @@ class MainCls(wx.Frame):
         (CompilerPath, Compilerflags) = self.SetupCompiler()
         
         if "-fopenmp" in Compilerflags:
-            print "Using OpenMP..."            
+            print ("Using OpenMP...")            
             File = open(os.path.join(self.InitialDirectoryStr, "Auxillary", "Parallelisation.h"), "w+")
             File.write("#include <omp.h>")
             File.close()
@@ -742,7 +743,7 @@ class MainCls(wx.Frame):
             File.close()
         
         if "UserDefined.h" in os.listdir(os.path.join(self.InitialDirectoryStr, 'Models', self.ModelPath)):
-            print "Custom-made UserDefined.h located..."
+            print ("Custom-made UserDefined.h located...")
             File = open(os.path.join(self.InitialDirectoryStr, "Auxillary", "IncludeUserDefined.h"), "w+")
             File.write('#include "' + os.path.join(self.InitialDirectoryStr, 'Models', self.ModelPath, 'UserDefined.h'))
             File.close()
@@ -752,13 +753,17 @@ class MainCls(wx.Frame):
             File.close()
         
         if "WillItFit.com" not in os.listdir(self.InitialDirectoryStr):
-            print "Compiling (no compiled C-module found...)"          
+            print ("Compiling (no compiled C-module found...)")          
             CompilerArguments = [CompilerPath, SourceFileLocation, "-o", ExecutableFileLocation] + Compilerflags
+            print (CompilerArguments)
+            print ("\n")
             Compilationresult = subprocess.call(CompilerArguments)
         elif os.path.getmtime(ExecutableFileLocation) < self.CheckNewestFile():
             os.remove(ExecutableFileLocation)
-            print "Recompiling (the source code has been altered, or a new model has been selected...)"
+            print ("Recompiling (the source code has been altered, or a new model has been selected...)")
             CompilerArguments = [CompilerPath, SourceFileLocation, "-o", ExecutableFileLocation] + Compilerflags
+            print (CompilerArguments)
+            print ("\n")
             Compilationresult = subprocess.call(CompilerArguments)
         else:
             Compilationresult = 0        
@@ -788,10 +793,11 @@ class MainCls(wx.Frame):
         ProcessToCall.append('-d=%s' % PDBStr)
         ProcessToCall.append('-h=%s' % ChiSquareFractile)
         ProcessToCall.append('-a=%d' % FittingRoutineArgument3)
-        
+        print (ProcessToCall)
+        print ("\n")
+
         Process = subprocess.Popen(ProcessToCall)
         BusyDialog = WaitingDialog("WillItFit is running...", "Will it fit...?", Process)
-        
         if BusyDialog.ShowModal() == wx.ID_CANCEL:
             Process.kill()
             DisplayedMessage = 'Algorithm aborted prematurely...'
@@ -809,14 +815,11 @@ class MainCls(wx.Frame):
             
             Chisquare = GetChisquare()
             DisplayedMessage = 'Algorithm concluded correctly and returned a chisquare of ' + Chisquare + '.'
-            
-            wx.MessageBox(DisplayedMessage, "Did it fit...?", wx.OK | wx.ICON_INFORMATION)
+            wx.MessageBox(DisplayedMessage, 'Info', wx.OK | wx.ICON_INFORMATION)      
         except:
             ReturnMessage = GetReturnMessage()
             DisplayedMessage = 'Algorithm concluded incorrectly with the following message: ' + ReturnMessage
-            
-            wx.MessageBox(DisplayedMessage, "Did it fit...?", wx.OK | wx.ICON_INFORMATION)
-
+            wx.MessageBox(DisplayMessage, 'Info', wx.OK | wx.ICON_INFORMATION)
 ## Define function to be executed
     def UndoFnc(self, event):
         self.PrintParameters('ParametersBefore.mcp')
@@ -995,7 +998,7 @@ class MainCls(wx.Frame):
 ## Define function for filebrowsing for data
     def BrowseDataFnc(self, event):
         FileDialogWindow = wx.FileDialog(None, 'Please select .card-file...', os.getcwd(), defaultFile = '', \
-                                         wildcard = 'Card files (.card)|*.card|All files|*.*', style = wx.OPEN)
+                                         wildcard = 'Card files (.card) |*.card|' 'All files |*.', style = wx.FD_OPEN)
         
         if FileDialogWindow.ShowModal() == wx.ID_OK:
             self.DataPathStr = FileDialogWindow.GetPath()
@@ -1024,7 +1027,7 @@ class MainCls(wx.Frame):
 ## Define function for filebrowsing for samples
     def BrowseSamplesFnc(self, event):
         FileDialogWindow = wx.FileDialog(None, 'Please select samples file...', os.getcwd(), defaultFile = '', \
-                                         wildcard = 'Sample files (.dat)|*.dat|All files|*.*', style = wx.OPEN)
+                                         wildcard = 'Sample files (.dat) |*.dat|' 'All files |*.', style = wx.FD_OPEN)
         
         if FileDialogWindow.ShowModal() == wx.ID_OK:
             self.SamplesPathStr = FileDialogWindow.GetPath()
@@ -1047,7 +1050,7 @@ class MainCls(wx.Frame):
 ## Define function for filebrowsing for parameters
     def BrowseParametersFnc(self, event):
         FileDialogWindow = wx.FileDialog(None, 'Please select parameter file...', os.getcwd(), defaultFile = '', \
-                                         wildcard = 'Parameter files (.par)|*.par|All files|*.*', style = wx.OPEN)
+                                         wildcard = 'Parameter files (.par) |*.par|' 'All files |*.', style = wx.FD_OPEN)
         
         if FileDialogWindow.ShowModal() == wx.ID_OK:
             self.ParametersPathStr = FileDialogWindow.GetPath()
@@ -1068,7 +1071,7 @@ class MainCls(wx.Frame):
 ## Define function for filebrowsing for samples
     def BrowseResolutionFnc(self, event):
         FileDialogWindow = wx.FileDialog(None, 'Please select resolution info file...', os.getcwd(), defaultFile = '', \
-                                         wildcard = 'Resolution files (.res)|*.res|All files|*.*', style = wx.OPEN)
+                                         wildcard = 'Resolution files (.res) |*.res|' 'All files |*.', style = wx.FD_OPEN)
         
         if FileDialogWindow.ShowModal() == wx.ID_OK:
             self.ResolutionPathStr = FileDialogWindow.GetPath()
@@ -1090,7 +1093,7 @@ class MainCls(wx.Frame):
 ## Define function for filebrowsing for samples
     def BrowsePDBFnc(self, event):
         FileDialogWindow = wx.FileDialog(None, 'Please select .pdb-file...', os.getcwd(), defaultFile = '', \
-                                         wildcard = 'PDB-files (.pdb)|*.pdb|All files|*.*', style = wx.OPEN)
+                                         wildcard = 'PDB-files (.pdb) |*.pdb|' 'All files |*.', style = wx.FD_OPEN)
         
         if FileDialogWindow.ShowModal() == wx.ID_OK:
             self.PDBPathStr = FileDialogWindow.GetPath()
@@ -1349,15 +1352,17 @@ class WaitingDialog(wx.Dialog):
         if self.RunningProcess.poll() == 0:
             if self.IsModal():
                 self.EndModal(wx.ID_OK)
-            
+            self.Timer.Stop()
             self.Destroy()
 
     def OnCancel(self):
         self.EndModal(wx.ID_CANCEL)
+        self.Timer.Stop()
         self.Destroy()
     
     def OnClose(self, event):
         self.EndModal(wx.ID_CANCEL)
+        self.Timer.Stop()
         self.Destroy()
 
 ## Read data files
@@ -1441,7 +1446,7 @@ if __name__ == '__main__':
     Frame = MainCls(parent = None, id = -1)
 
     IconPath = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'WillItFit.png')
-    Icon = wx.EmptyIcon()
+    Icon = wx.Icon()
     Icon.CopyFromBitmap(wx.Bitmap(IconPath, wx.BITMAP_TYPE_ANY))
     Frame.SetIcon(Icon)
 

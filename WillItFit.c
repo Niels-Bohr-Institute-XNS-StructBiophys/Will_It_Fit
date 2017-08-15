@@ -61,9 +61,6 @@
 #include "Formfactors/FormfactorEllipticCylinderWithEllipsoidalEndcaps.h"
 #include "Formfactors/FormfactorRodWithoutEndcaps.h"
 
-// Include model
-#include "Auxillary/ModelLocation.h"
-
 // Include I/O
 #include "InputOutput/ImportSpectra.h"
 #include "InputOutput/ImportParameters.h"
@@ -71,6 +68,12 @@
 #include "InputOutput/ImportPDBFile.h"
 #include "InputOutput/OutputSpectra.h"
 #include "InputOutput/OutputParameters.h"
+#include "InputOutput/BetaIO.h"
+
+// Include model
+#include "Auxillary/ModelLocation.h"
+
+
 
 // Include functions accounting for instrumental smearing
 #include "Resolution/SigmaOfQ.h"
@@ -138,6 +141,7 @@ int main(int argc, char *argv[])
     int FittingRoutineError = -1;
 
     bool PrintCovarianceMatrix = false;
+    bool CMD = false;
     char Message[256];
 
     // Variables describing the resolution
@@ -154,8 +158,7 @@ int main(int argc, char *argv[])
     /// Obtain arguments from program or request them in console
     AssignArguments(argc, argv, CardFileLocation, SamplesFileLocation, ParameterFileLocation, &QMin, &QMax, &ChooseFittingRoutine,
                     &FittingRoutineArgument2, &IncludeResolutionEffects, &NumberOfSmearingFolds, ResolutionFileLocation,
-                    &PrintCovarianceMatrix, PDBFileLocation, &ChiSquareFractile, &FittingRoutineArgument3);
-
+                    &PrintCovarianceMatrix, PDBFileLocation, &ChiSquareFractile, &FittingRoutineArgument3, &CMD);
     /// Retrieve parameters
     printf("\n");
     printf("Reading initial values of parameters. \n");
@@ -181,7 +184,7 @@ int main(int argc, char *argv[])
     printf("\n");
     ClearScreen();
 
-    HighestNumberOfDatapoints = CheckSizeOfData(CardFileLocation, &NumberOfSpectra);
+    HighestNumberOfDatapoints = CheckSizeOfData(CardFileLocation, &NumberOfSpectra, CMD);
     Errorcheck(HighestNumberOfDatapoints, "reading the datafiles");
 
     AllocateData(&Data, NumberOfSpectra);
@@ -198,7 +201,7 @@ int main(int argc, char *argv[])
         Data[i].IncludeResolutionEffects = false;
     }
 
-    ImportSpectra(Data, CardFileLocation, NumberOfSpectra);
+    ImportSpectra(Data, CardFileLocation, NumberOfSpectra, CMD);
 
     for (i = 0; i < NumberOfSpectra; ++i) {
         TotalNumberOfDatapoints += Data[i].NumberOfDatapoints;
@@ -377,6 +380,7 @@ int main(int argc, char *argv[])
     /// Return the chisquare if the algorithm executes correctly
     sprintf(Message, "%g and a reduced chisquare of %g", ChiSquare, ChiSquareRed);
     ReturnMessage(Message);
-
     return 0;
+
+
 }

@@ -78,7 +78,7 @@ void AssignFittingRanges(struct Dataset * Data, double QMin, double QMax, int Nu
 void AssignArguments(int NumberOfArguments, char *Arguments[], char CardFileLocation[256], char SamplesFileLocation[256], char ParameterFileLocation[256],
                      double *QMin, double *QMax, int *ChooseFittingRoutine, int *FittingRoutineArgument2,
                      bool *IncludeResolutionEffects, int *NumberOfSmearingFolds, char ResolutionFileLocation[256], bool *PrintCorrelationMatrix,
-                     char PDBFileLocation[256], double *ChiSquareFractile, int *FittingRoutineArgument3)
+                     char PDBFileLocation[256], double *ChiSquareFractile, int *FittingRoutineArgument3, bool * CMD)
 {
     // Declarations
     int i;
@@ -161,10 +161,39 @@ void AssignArguments(int NumberOfArguments, char *Arguments[], char CardFileLoca
                 *FittingRoutineArgument3 = atoi(Argument);
             break;
 
+            case 'z':
+                *CMD = atoi(Argument);
+            break;
             // Unknown argument
             default:
                 printf("Unknown arguments passed to algorithm! \n");
             break;
         }
     }
+}
+
+
+void DirectoryFinder(char FileLocation[256], char Directory[256]){
+    int length;
+    int i;
+    int j;
+    char curr;
+    char check = '/';
+    //loop backwards through FileLocation string to find the end of the directory
+    length = strlen(FileLocation);
+    for (i= length -1; i >= 0; --i)
+    {
+        curr = FileLocation[i];
+        if(curr == check)
+        {
+            break;
+        }
+    }
+    //Second loop assigns characters in the directory string
+    for(j = 0; j <= i; ++j)
+    {
+        Directory[j] = FileLocation[j];
+    }
+
+
 }

@@ -1,0 +1,9 @@
+-1                0                 1                 1   BackN100
+0.9               1                 1.1               1   ScaleN100
+-1                0                 1                 1   BackN0
+0.9               1                 1.1               1   ScaleN0
+-1                0                 1                 1   BackX
+0.9               1                 1.1               1   ScaleX
+0.9               1                 1.1               1   ScaleConc
+1.0001               1.0001               1.3               1 HYDR
+0.8               1.00               1.2               1 GLYCV

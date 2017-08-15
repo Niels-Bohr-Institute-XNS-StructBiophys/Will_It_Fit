@@ -1,0 +1,15 @@
+-200.	1.0	200.00	1	ChainX
+-200.	1.0	200.00   1	ChainY
+-200.	1.0	200.00	1	ChainZ
+1. 1. 10. 1 ChainDr
+1.  1000. 5000. 1 ContourLenght
+1.  13. 1000. 1 KuhnLenght
+0.00    1.00    1.0     1   ChainContrast
+-1                0                 1                 1   BackN100
+0.9               1                 1.1               1   ScaleN100
+-1                0                 1                 1   BackN0
+0.9               1                 1.1               1   ScaleN0
+-1                0                 1                 1   BackX
+0.9               1                 1.1               1   ScaleX
+0.9               1                 1.1               1   ScaleConc
+0.0               1                 1.1               1   ProtScale
