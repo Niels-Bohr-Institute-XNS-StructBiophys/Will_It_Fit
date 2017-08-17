@@ -111,6 +111,12 @@ double expand(double complex **alpha,double complex **F)
     double sinth[Ntheta];
     double w[Ntheta]={0};
     double legendre[Ntheta][Nh+1];
+    size_t LegendreSize = gsl_sf_legendre_array_n(Nh);
+    int LegendreIndex = 0;
+    double Legendre[LegendreSize];
+    double alph = 0.;
+    const int LegendreMode = 0;
+
     for(i=0;i<Ntheta;i++){
         fm[i]=0;
     }
@@ -125,28 +131,24 @@ double expand(double complex **alpha,double complex **F)
         }
     }
 
-    for(m=0;m<Nh+1;m+=skip){ //Because symetry of disc only the even harmonics contribute
-        for(ntheta=0;ntheta<Ntheta;ntheta++){
-            fm[ntheta]=0.;
-            for(nphi=0;nphi<Nphi;nphi++){  //integration over phi
+
+    for (ntheta=0;ntheta<Ntheta;ntheta++){
+        theta = (ntheta+.5)*thetastep; //Theta integration
+        fm[ntheta] = 0.;
+        sinth[ntheta] = sin(theta);
+        gsl_sf_legendre_array(LegendreMode, Nh, cos(theta), Legendre);//Calculate all Plm(cos(th)) for l=m ... to l=N;
+        for(m=0;m<Nh+1;m+=skip){
+            for(nphi=0;nphi<Nphi;nphi++){//Phi integration
                 phi=phistep*(nphi+.5);
                 if(ntheta==0)
                     phase[m][nphi]=pol(phistep,-m*phi);
                 fm[ntheta]+= F[ntheta][nphi]*phase[m][nphi];  //fm(theta)= int_0^2pi [ F(theta,phi) exp(-m*phi) dphi ]
             }
-        }
-        for(l=m;l<=Nh;l+=skip){   //For disc symmetry only even harmonics contribute
-            for(ntheta=0;ntheta<Ntheta;ntheta++){    //integration over theta
-                theta=(ntheta+.5)*thetastep;
-                if(l==m){
-                    gsl_sf_legendre_sphPlm_array(Nh,m,cos(theta),&legendre[ntheta][l]);//Calculate all Plm(cos(th)) for l=m ... to l=N;
-                    sinth[ntheta]=sin(theta);
-                }
-                alpha[l][m]+=1/sqrt(4*M_PI)*legendre[ntheta][l]*w[ntheta]*sinth[ntheta]*fm[ntheta];//alpha_lm=int_0^pi [ P_lm*sin(theta)*fm(theta)*dtheta ]
-            }
-            //Int+=((m>0)+1)*pow( cabs(alpha[l][m]) , 2 ); //sum over l and m
-            //// Intensity can be calculated here or outside the function in
-            //seperate loop
+            for(l=m;l<=Nh;l+=skip){ //For disc symmetry only even harmonics contribute
+                LegendreIndex = gsl_sf_legendre_array_index(l, m);
+                alph = 1/sqrt(4*M_PI)*Legendre[LegendreIndex]*w[ntheta]*sinth[ntheta]*fm[ntheta];
+                alpha[l][m] += alph;//1/sqrt(4*M_PI)*Legendre[legendreIndex]*w[ntheta]*sinth[ntheta]*fm[ntheta];
+            }      
         }
     }
     return Int;
@@ -188,7 +190,12 @@ void AddScatteringFromResidue(double complex **beta, double Q, struct Residue re
     double zn;
     int l,m;
     double Volume=residue.Volume*CV_protein;
-    double legendre[Nh+1];
+    //Variables used for calculating Plm functions
+    int LegendreSize =  gsl_sf_legendre_array_n(Nh);
+    int LegendreIndex;
+    const int LegendreMode = 0;
+    double Legendre[LegendreSize];
+
     double bessel[Nh+1];
     double rho_bg=rho_solvent;
     double SQRT4pi=sqrt(4*M_PI);
@@ -224,11 +231,11 @@ void AddScatteringFromResidue(double complex **beta, double Q, struct Residue re
     double thetan=acos(zn/rn);
     double phin=acos(xn/(rn*sin(thetan)))*sign(yn);
     gsl_sf_bessel_jl_array(Nh,Q*rn,bessel); // Calculate spherical bessel functions for l=0,..,Nh
-    for(m=0;m<=Nh;m++){
-        gsl_sf_legendre_sphPlm_array(Nh,m,cos(thetan),&legendre[m]); //Calculate legendre polynomials P_l(cos(theta)) of degree l=m,..., up to Nh
-                                                                     //Store the values in legendre[m],legendre[m+1],...,legendre[Nh]
+    gsl_sf_legendre_array(LegendreMode, Nh,cos(thetan),Legendre); //Calculate legendre polynomials P_l(cos(theta)) of degree l=m,..., up to Nh   
+    for(m=0;m<=Nh;m++){                                                               
         for(l=m;l<Nh+1;l++){
-            beta[l][m]+=SQRT4pi*cpow(I,l)*DeltaB*bessel[l]*legendre[l]*pol(1,-m*phin);
+            LegendreIndex = gsl_sf_legendre_array_index(l,m);
+            beta[l][m]+=SQRT4pi*cpow(I,l)*DeltaB*bessel[l]*Legendre[LegendreIndex]*pol(1,-m*phin);
         }
     }
 }

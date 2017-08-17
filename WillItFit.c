@@ -72,7 +72,7 @@
 
 // Include model
 #include "Auxillary/ModelLocation.h"
-
+#define L_GSL 7
 
 
 // Include functions accounting for instrumental smearing
@@ -154,6 +154,7 @@ int main(int argc, char *argv[])
 
     /// Setup errorchecking
     ReturnMessage("Program terminated before error catching.");
+
 
     /// Obtain arguments from program or request them in console
     AssignArguments(argc, argv, CardFileLocation, SamplesFileLocation, ParameterFileLocation, &QMin, &QMax, &ChooseFittingRoutine,

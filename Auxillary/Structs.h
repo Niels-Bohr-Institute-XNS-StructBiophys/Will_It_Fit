@@ -61,6 +61,7 @@ struct Residue {
     double XRayScatteringLength;
     double NeutronScatteringLength;
     double Volume;
+    double Weight;
 
     // Book-keeping
     char Name[5];

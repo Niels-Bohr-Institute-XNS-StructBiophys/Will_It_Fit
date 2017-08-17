@@ -68,9 +68,9 @@ void OutputDataBash(double ChiSquare, double QMin, double QMax, struct Parameter
     fprintf(fp, "%s %d\n",ProteinStructure.Residues[i].Name,i);
     }
     // Calculate Molecular Weigth
-    double Weight = 0.0;
-   double WeightModification = 0.0;
-  double VolumeModification = 0.0;
+    double Weight = 0.0;   
+    double WeightModification = 0.0;
+    double VolumeModification = 0.0;
     for (i = 0; i < ProteinStructure.NumberOfResidues; ++i){
 	    if(strcmp(ProteinStructure.Residues[i].Name, "W") != 0 ){ // Skip waters in calculation of molecular weight
 

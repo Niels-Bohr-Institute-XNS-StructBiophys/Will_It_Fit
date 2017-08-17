@@ -1,6 +1,6 @@
-void OutputData(double ChiSquare, double QMin, double QMax, struct Parameter * Parameters, int NumberOfParameters,
+void OutputData(double ChiSquare, double ChiSquareRed,  double QMin, double QMax, struct Parameter * Parameters, int NumberOfParameters,
                 struct Dataset * Data, int NumberOfSpectra, char cardfilename[128], struct Protein ProteinStructure, 
-                struct UserDefined UserDefinedStructure, char SampleFilename[256], char *ResultsDirectory)
+                struct UserDefined UserDefinedStructure, char SampleFilename[256])
 {
     /// Declarations
     // Declare dummy variables used in function
@@ -8,14 +8,12 @@ void OutputData(double ChiSquare, double QMin, double QMax, struct Parameter * P
 
     // Variables describing the output file
     FILE *fp;
-    //const char *filename;
-    char Filename[256];
-    sprintf(Filename, "%s/Results.wif", ResultsDirectory);
-    //filename = "Results.wif";
+    const char *filename;
+    filename = "Results.wif";
 
     /// I/O
     // Create the output file
-    fp = fopen(Filename, "w+");
+    fp = fopen(filename, "w+");
 
     // Print filfilenames to file
     fprintf(fp, ".card-file: \n");
@@ -38,6 +36,7 @@ void OutputData(double ChiSquare, double QMin, double QMax, struct Parameter * P
 
     // Print fit quality to file
     fprintf(fp, "Final chisq = %g \n", ChiSquare);
+    fprintf(fp, "Final chisqred = %g \n", ChiSquareRed);
 
     fprintf(fp, "\n");
 

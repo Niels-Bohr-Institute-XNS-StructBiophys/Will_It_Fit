@@ -58,33 +58,33 @@ double SemiflexibleChainAmplitude(double q, double L, double b){
 }
 
 double SemiflexibleChainAmp(int NL, double q, double L, double b){
-    int i = 0;
-    if(NL<q*100)
-        NL=(int) q*100;
-    if(NL>1500)
-        NL=1500;
-    double ll,dL=L/NL;
-    double psi, CoilSelf=0, CoilAmp=0;
-    // intensity calculation
-    for(i=0;i<NL;i++){
-        ll=(i+0.5)*dL;
-        psi = SemiflexibleChainAmplitude(q, ll, b);
-        CoilSelf += 2.* psi * (L-ll)/L /NL;
-        CoilAmp  += psi /NL;
-    }
-    return CoilAmp;
+  int i = 0;
+  if(NL<q*100)
+      NL=(int) q*100;
+  if(NL>1500)
+      NL=1500;
+  double ll,dL=L/NL;
+  double psi, CoilSelf=0, CoilAmp=0;
+  // intensity calculation
+  for(i=0;i<NL;i++){
+      ll=(i+0.5)*dL;
+      psi = SemiflexibleChainAmplitude(q, ll, b);
+      CoilSelf += 2.* psi * (L-ll)/L /NL;
+      CoilAmp  += psi /NL;
+  }
+  return CoilAmp;
 }
 
 double SemiflexibleChainSelf(int NL, double q, double L, double b){
-    double l,dL=L/NL;
-    double psi, CoilSelf=0, CoilAmp=0;
-    int i;
-    for(i=0;i<NL;i++){
-        l=(i+0.5)*dL;
-        psi = SemiflexibleChainAmplitude(q, l, b);
-        CoilSelf += 2.* psi * (L-l)/L /NL;
-    }
-    return CoilSelf;
+  double l,dL=L/NL;
+  double psi, CoilSelf=0, CoilAmp=0;
+  int i;
+  for(i=0;i<NL;i++){
+      l=(i+0.5)*dL;
+      psi = SemiflexibleChainAmplitude(q, l, b);
+      CoilSelf += 2.* psi * (L-l)/L /NL;
+  }
+  return CoilSelf;
 
 }
 
@@ -113,7 +113,7 @@ int Sign(double x) {
         Result = 1;
     } else {
         Result = 0;
-    }
+	}
 
     return Result;
 }
@@ -129,27 +129,22 @@ double complex PolarComplexNumber(double Radius, double Phi)
 void AddScatteringFromResidue(double complex **Beta, double q, struct Residue CurrentResidue, double Contrast, double ScatteringLengthDensityOfSolvent, double DeltaB) {
     // Søren Kynde, 2012 (rewritten by Martin Cramer Pedersen, 2015)
     // This function adds the scattering of a residue to the scattering amplitude expandended by the spherical harmonic coefficients Beta_lm.
-    int l;
-    int m;
+	int l;
+	int m;
 
     double x;
     double y;
     double z;
 
-    double Radius;
-    double Theta;
-    double Phi;
+	double Radius;
+	double Theta;
+	double Phi;
 
-    //Variables used for calculating Plm functions
-    int LegendreSize =  gsl_sf_legendre_array_n(NumberOfHarmonics);
-    int LegendreIndex;
-    const int LegendreMode = 0;
-    double Legendre[LegendreSize];
-
+    double Legendre[NumberOfHarmonics + 1];
     double Bessel[NumberOfHarmonics + 1];
     double ScatteringLengthOfResidue;
-    double ScatteringLengthOfDisplacedSolvent = CurrentResidue.Volume * ScatteringLengthDensityOfSolvent;
-    double ExcessScatteringLength;
+	double ScatteringLengthOfDisplacedSolvent = CurrentResidue.Volume * ScatteringLengthDensityOfSolvent;
+	double ExcessScatteringLength;
     if (Contrast < 0.0) {
        ScatteringLengthOfResidue = CurrentResidue.XRayScatteringLength;
        ExcessScatteringLength    = ScatteringLengthOfResidue - ScatteringLengthOfDisplacedSolvent;
@@ -160,8 +155,7 @@ void AddScatteringFromResidue(double complex **Beta, double q, struct Residue Cu
        y = (CurrentResidue.yXRayScattering * ScatteringLengthOfResidue - CurrentResidue.yVolume * ScatteringLengthOfDisplacedSolvent) / ExcessScatteringLength;
        // z = CurrentResidue.zVolume ;
        z = (CurrentResidue.zXRayScattering * ScatteringLengthOfResidue - CurrentResidue.zVolume * ScatteringLengthOfDisplacedSolvent) / ExcessScatteringLength;
-    }
-    else {
+    } else {
        ScatteringLengthOfResidue = CurrentResidue.NeutronScatteringLength;
        ExcessScatteringLength    = ScatteringLengthOfResidue - ScatteringLengthOfDisplacedSolvent;
 
@@ -178,17 +172,16 @@ void AddScatteringFromResidue(double complex **Beta, double q, struct Residue Cu
     Phi    = acos(x / (Radius * sin(Theta))) * Sign(y);
 
 
-    // Calculate spherical Bessel functions for l = 0 to NumberOfHarmonics
+	// Calculate spherical Bessel functions for l = 0 to NumberOfHarmonics
 
     gsl_sf_bessel_jl_array(NumberOfHarmonics, q * Radius, Bessel);
 
-    // Calculate Legendre polynomials P_l(cos(theta)) of degree l = m to NumberOfHarmonics - store the values in Legendre[m], Legendre[m + 1], ..., Legendre[NumberOfHarmonics]
-    gsl_sf_legendre_array(LegendreMode, NumberOfHarmonics, cos(Theta), Legendre);
+	// Calculate Legendre polynomials P_l(cos(theta)) of degree l = m to NumberOfHarmonics - store the values in Legendre[m], Legendre[m + 1], ..., Legendre[NumberOfHarmonics]
     for (m = 0; m < NumberOfHarmonics + 1; m++) {
+        gsl_sf_legendre_sphPlm_array(NumberOfHarmonics, m, cos(Theta), &Legendre[m]);
+
         for (l = m; l < NumberOfHarmonics + 1; l++) {
-            LegendreIndex = gsl_sf_legendre_array_index(l,m);
-            printf("%f \n", Legendre[LegendreIndex]);
-            Beta[l][m] += sqrt(DeltaB)*sqrt(4.0 * M_PI) * cpow(I, l) * ExcessScatteringLength * Bessel[l] * Legendre[LegendreIndex] * PolarComplexNumber(1.0, -m * Phi);
+            Beta[l][m] += sqrt(DeltaB)*sqrt(4.0 * M_PI) * cpow(I, l) * ExcessScatteringLength * Bessel[l] * Legendre[l] * PolarComplexNumber(1.0, -m * Phi);
         }
     }
 }
@@ -196,29 +189,24 @@ void AddScatteringFromResidue(double complex **Beta, double q, struct Residue Cu
 void AddScatteringFromSolvent(double complex **Beta, double q, struct Residue CurrentResidue, double Contrast, double ScatteringLengthDensityOfSolvent, double DeltaB) {
     // Søren Kynde, 2012 (rewritten by Martin Cramer Pedersen, 2015)
     // This function adds the scattering of a residue to the scattering amplitude expandended by the spherical harmonic coefficients Beta_lm.
-    int l;
-    int m;
+	int l;
+	int m;
 
     double x;
     double y;
     double z;
 
-    double Radius;
-    double Theta;
-    double Phi;
+	double Radius;
+	double Theta;
+	double Phi;
 
-    //Variables used for calculating Plm functions
-    int LegendreSize =  gsl_sf_legendre_array_n(NumberOfHarmonics);
-    int LegendreIndex;
-    const int LegendreMode = 0;
-
-    double Legendre[LegendreSize];
+    double Legendre[NumberOfHarmonics + 1];
     double Bessel[NumberOfHarmonics + 1];
     double ScatteringLengthOfResidue;
     double AverageVolume = 4.*M_PI * pow(1.28,3.) / 3.  ; // From Crysol paper 
 
     double ScatteringLengthOfDisplacedSolvent = CurrentResidue.Volume * ScatteringLengthDensityOfSolvent;
-    double ExcessScatteringLength;
+	double ExcessScatteringLength;
     if (Contrast < 0.0) {
        ScatteringLengthOfResidue = CurrentResidue.XRayScatteringLength;
        ExcessScatteringLength    = ScatteringLengthOfDisplacedSolvent;
@@ -240,43 +228,43 @@ void AddScatteringFromSolvent(double complex **Beta, double q, struct Residue Cu
     Phi    = acos(x / (Radius * sin(Theta))) * Sign(y);
 
 
-    // Calculate spherical Bessel functions for l = 0 to NumberOfHarmonics
+	// Calculate spherical Bessel functions for l = 0 to NumberOfHarmonics
 
     gsl_sf_bessel_jl_array(NumberOfHarmonics, q * Radius, Bessel);
-    gsl_sf_legendre_array(LegendreMode, NumberOfHarmonics, cos(Theta), Legendre);
-    // Calculate Legendre polynomials P_l(cos(theta)) of degree l = m to NumberOfHarmonics - store the values in Legendre[m], Legendre[m + 1], ..., Legendre[NumberOfHarmonics]
+
+	// Calculate Legendre polynomials P_l(cos(theta)) of degree l = m to NumberOfHarmonics - store the values in Legendre[m], Legendre[m + 1], ..., Legendre[NumberOfHarmonics]
     for (m = 0; m < NumberOfHarmonics + 1; m++) {
+        gsl_sf_legendre_sphPlm_array(NumberOfHarmonics, m, cos(Theta), &Legendre[m]);
+
         for (l = m; l < NumberOfHarmonics + 1; l++) {
-            LegendreIndex = gsl_sf_legendre_array_index(l,m);
-            printf("%f \n", Legendre[LegendreIndex]);
-            Beta[l][m] += sqrt(DeltaB)*sqrt(4.0 * M_PI) * cpow(I, l) * ExcessScatteringLength * exp(-1.*pow(q,2.)*pow(AverageVolume, 2./3.)/(4.*M_PI))* Bessel[l] * Legendre[LegendreIndex] * PolarComplexNumber(1.0, -m * Phi);
+            Beta[l][m] += sqrt(DeltaB)*sqrt(4.0 * M_PI) * cpow(I, l) * ExcessScatteringLength * exp(-1.*pow(q,2.)*pow(AverageVolume, 2./3.)/(4.*M_PI))* Bessel[l] * Legendre[l] * PolarComplexNumber(1.0, -m * Phi);
         }
     }
 }
 
 void CopyResidue(struct Residue * Original, struct Residue * Copy) {
-    Copy->xVolume = Original->xVolume;
-    Copy->yVolume = Original->yVolume;
-    Copy->zVolume = Original->zVolume;
+	Copy->xVolume = Original->xVolume;
+	Copy->yVolume = Original->yVolume;
+	Copy->zVolume = Original->zVolume;
 
-    Copy->xXRayScattering = Original->xXRayScattering;
-    Copy->yXRayScattering = Original->yXRayScattering;
-    Copy->zXRayScattering = Original->zXRayScattering;
+	Copy->xXRayScattering = Original->xXRayScattering;
+	Copy->yXRayScattering = Original->yXRayScattering;
+	Copy->zXRayScattering = Original->zXRayScattering;
 
-    Copy->xNeutronScattering = Original->xNeutronScattering;
-    Copy->yNeutronScattering = Original->yNeutronScattering;
-    Copy->zNeutronScattering = Original->zNeutronScattering;
+	Copy->xNeutronScattering = Original->xNeutronScattering;
+	Copy->yNeutronScattering = Original->yNeutronScattering;
+	Copy->zNeutronScattering = Original->zNeutronScattering;
 
-    Copy->XRayScatteringLength    = Original->XRayScatteringLength;
-    Copy->NeutronScatteringLength = Original->NeutronScatteringLength;
+	Copy->XRayScatteringLength    = Original->XRayScatteringLength;
+	Copy->NeutronScatteringLength = Original->NeutronScatteringLength;
 
-    Copy->Volume    = Original->Volume;
-    Copy->Name[0]   = Original->Name[0];
-    Copy->Name[1]   = Original->Name[1];
-    Copy->Name[2]   = Original->Name[2];
-    Copy->Name[3]   = Original->Name[3];
-//  printf("%s\n", Copy->Name);
-    Copy->ResidueID = Original->ResidueID;
+	Copy->Volume    = Original->Volume;
+	Copy->Name[0]   = Original->Name[0];
+	Copy->Name[1]   = Original->Name[1];
+	Copy->Name[2]   = Original->Name[2];
+	Copy->Name[3]   = Original->Name[3];
+//	printf("%s\n", Copy->Name);
+	Copy->ResidueID = Original->ResidueID;
 }
 
 int sign(double x){
@@ -290,14 +278,15 @@ int sign(double x){
     return result;
 }
 
-double complex pol(double r, double phi){
+double complex pol(double r, double phi)
+{
     if(phi==0)
         return r+I*0;
     else
         return r*(cos(phi)+I*sin(phi));
 }
-
-double complex **ComplexArray(dim1,dim2){
+double complex **ComplexArray(dim1,dim2)
+{
     int i,ii;
     double complex ** arr;
     arr = (double complex**)malloc(dim1*sizeof(double complex*));
@@ -310,7 +299,8 @@ double complex **ComplexArray(dim1,dim2){
     return arr;
 }
 
-void FreeComplexArray(double complex **alpha, int dim1, int dim2){
+void FreeComplexArray(double complex **alpha, int dim1, int dim2)
+{
     int i;
     for(i=0;i<dim1;i++){
         free(alpha[i]);
@@ -325,15 +315,10 @@ void AddScatteringFromSemiflexibleTag(double complex **beta, double Q, double x_
     //expandended by the spherical harmonic coefficients beta_lm.
 
     int l,m;
-    //Variables used for calculating Plm functions
-    int LegendreSize =  gsl_sf_legendre_array_n(NumberOfHarmonics);
-    int LegendreIndex;
-    const int LegendreMode = 0;
-
-    double Legendre[LegendreSize];
+    double legendre[NumberOfHarmonics+1];
     double bessel[NumberOfHarmonics+1];
     double SQRT4pi=sqrt(4*M_PI);
-    //    double X=pow((Q*Rg_tag),2);
+//    double X=pow((Q*Rg_tag),2);
 
 
     double PSI = SemiflexibleChainAmp(NL, Q, L, b);//(1-exp(-X))/X;
@@ -344,12 +329,11 @@ void AddScatteringFromSemiflexibleTag(double complex **beta, double Q, double x_
 
 
     gsl_sf_bessel_jl_array(NumberOfHarmonics,Q*rn,bessel); // Calculate spherical bessel functions for l=0,..,Nh
-    gsl_sf_legendre_array(LegendreMode,NumberOfHarmonics,cos(thetan),Legendre); //Calculate legendre polynomials P_l(cos(theta)) of degree l=m,..., up to Nh 
-    for(m=0;m<=NumberOfHarmonics;m++){                                                       //Store the values in legendre[m],legendre[m+1],...,legendre[Nh]
+    for(m=0;m<=NumberOfHarmonics;m++){
+        gsl_sf_legendre_sphPlm_array(NumberOfHarmonics,m,cos(thetan),&legendre[m]); //Calculate legendre polynomials P_l(cos(theta)) of degree l=m,..., up to Nh
+                                                                     //Store the values in legendre[m],legendre[m+1],...,legendre[Nh]
         for(l=m;l<NumberOfHarmonics+1;l++){
-            LegendreIndex = gsl_sf_legendre_array_index(l,m);
-            printf("%f \n", Legendre[LegendreIndex]);
-            beta[l][m]+=DeltaB*PSI*SQRT4pi*cpow(I,l)*bessel[l]*Legendre[LegendreIndex]*pol(1,-m*phin);
+            beta[l][m]+=DeltaB*PSI*SQRT4pi*cpow(I,l)*bessel[l]*legendre[l]*pol(1,-m*phin);
         }
     }
 }
@@ -368,6 +352,6 @@ double Si(double x){
 }
 
 double RPAStructureFactor(double Itensity,double v){
-    return 1./(1.+Itensity*v);
+  return 1./(1.+Itensity*v);
 
 }
