@@ -223,7 +223,7 @@ void AssignAtom(char AtomName[2], double *XRayScatteringLengthOfCurrentAtom,doub
         }
         if (AtomName[0] == ' ' && AtomName[1] == 'Q' ){
           *XRayScatteringLengthOfCurrentAtom = 4.133*H2OXRayScatteringLength;
-          *NeutronScatteringLengthOfCurrentAtom = 4.133*H2ONeutronScatteringLength;
+          *NeutronScatteringLengthOfCurrentAtom = 4.133*H2OXRayScatteringLength; // Note that this is a dummy value. for neutron contrasts the scattering lengths of teh dummy waters are set in Model.h
           *VolumeOfCurrentAtom = 4.133*(H2OVolume);
 	  *WeightOfCurrentAtom = 0.0; //4.133*(2*HWeight+OWeight);
           AtomRecg = 1;
@@ -258,13 +258,13 @@ void AssignAtom(char AtomName[2], double *XRayScatteringLengthOfCurrentAtom,doub
           *WeightOfCurrentAtom = FEWeight;
 	   AtomRecg = 1;
         }
-	if (AtomName[0] == ' ' && AtomName[1] == 'I' ){
-          *XRayScatteringLengthOfCurrentAtom = IXRayScatteringLength;
-          *NeutronScatteringLengthOfCurrentAtom = INeutronScatteringLength;
-          *VolumeOfCurrentAtom = IVolume;
-          *WeightOfCurrentAtom = IWeight;
-	   AtomRecg = 1;
-        }
+//	if (AtomName[0] == ' ' && AtomName[1] == 'I' ){
+//          *XRayScatteringLengthOfCurrentAtom = IXRayScatteringLength;
+//          *NeutronScatteringLengthOfCurrentAtom = INeutronScatteringLength;
+//          *VolumeOfCurrentAtom = IVolume;
+//          *WeightOfCurrentAtom = IWeight;
+//	   AtomRecg = 1;
+//        }
 
 	if (AtomName[0] == 'N' && AtomName[1] == 'A' ){
           *XRayScatteringLengthOfCurrentAtom = NAXRayScatteringLength;
