@@ -12,6 +12,7 @@ int CheckNumberOfResiduesInPDBFile(char Filename[256])
     char AtomName[3];
     char ResidueName[4];
     char Dummychar;
+    char AltLoc[2];
    // I/O
     PointerToFile = fopen(Filename, "r");
 
@@ -23,19 +24,23 @@ int CheckNumberOfResiduesInPDBFile(char Filename[256])
     while(fgets(Linebuffer, sizeof(Linebuffer), PointerToFile) != NULL) {
         ResidueID = 0;
         
-	if (sscanf(Linebuffer, "ATOM  %5d%*6c%*3c%*9c%lf%lf%lf%*22c%2c", &ResidueID, &xDummy, &yDummy, &zDummy, &*AtomName) == 5) { // This line for reading individual atoms
+	if (sscanf(Linebuffer, "ATOM  %5d%*5c%c%*3c%*9c%lf%lf%lf%*22c%2c", &ResidueID,&*AltLoc, &xDummy, &yDummy, &zDummy, &*AtomName) == 6) { // This line for reading individual atoms
 
             if(ResidueID != PreviousResidueID && ResidueID != 0) {
-                ++NumberOfResidues;
+            if (strcmp(" ", AltLoc )== 0 || strcmp("A", AltLoc) == 0){
+    ++NumberOfResidues;
+	    }
             }
 
             PreviousResidueID = ResidueID;
         }
-	if (sscanf(Linebuffer, "HETATM%5d%*6c%*3c%*9c%lf%lf%lf%*22c%2c", &ResidueID, &xDummy, &yDummy, &zDummy, &*AtomName) == 5) {
+	if (sscanf(Linebuffer, "HETATM%5d%*5c%c%*3c%*9c%lf%lf%lf%*22c%2c", &ResidueID, &*AltLoc,&xDummy, &yDummy, &zDummy, &*AtomName) == 6) {
 
             if(ResidueID != PreviousResidueID && ResidueID != 0) {
-                ++NumberOfResidues;
-            }
+             if (strcmp(" ", AltLoc )== 0 || strcmp("A", AltLoc) == 0){
+      		     ++NumberOfResidues;
+	     }
+	     }
 
             PreviousResidueID = ResidueID;
         }
@@ -58,6 +63,7 @@ int CheckNumberOfAtomsInPDBFile(char Filename[256])
     int DummyID;
     char AtomName[3];
     char ResidueName[4];
+    char AltLoc[2];
     char Dummychar;
     int ResidueID;
 
@@ -71,13 +77,24 @@ int CheckNumberOfAtomsInPDBFile(char Filename[256])
 
     while(fgets(Linebuffer, sizeof(Linebuffer), PointerToFile) != NULL) {
         
-	if (sscanf(Linebuffer, "ATOM  %5d%*6c%*3c%*9c%lf%lf%lf%*22c%2c", &ResidueID, &xDummy, &yDummy, &zDummy, &*AtomName) == 5) { // This line for reading individual atoms
+	if (sscanf(Linebuffer, "ATOM  %5d%*5c%c%*3c%*9c%lf%lf%lf%*22c%2c", &ResidueID, &*AltLoc, &xDummy, &yDummy, &zDummy, &*AtomName) == 6) { // This line for reading individual atoms
 //	printf("%d %s %s \n",ResidueID,AtomName,ResidueName);
+
+	if (strcmp(" ", AltLoc )== 0){
             ++NumberOfAtoms;
-        }
-	if (sscanf(Linebuffer, "HETATM%5d%*6c%*3c%*9c%lf%lf%lf%*22c%2c", &ResidueID, &xDummy, &yDummy, &zDummy, &*AtomName) == 5) { // This line for reading individual atoms
+	}
+	if (strcmp("A", AltLoc )== 0){
+            ++NumberOfAtoms;
+	}
+	}
+	if (sscanf(Linebuffer, "HETATM%5d%*5c%c%*3c%*9c%lf%lf%lf%*22c%2c", &ResidueID, &*AltLoc, &xDummy, &yDummy, &zDummy, &*AtomName) == 6) { // This line for reading individual atoms
 //	printf("%d %c%c %s \n",ResidueID,AtomName[0],AtomName[1],ResidueName);
+        	if (strcmp(" ", AltLoc )== 0){
             ++NumberOfAtoms;
+	}
+	if (strcmp("A", AltLoc )== 0){
+            ++NumberOfAtoms;
+	}
         }
     }
 
@@ -117,19 +134,20 @@ void AssignAtom(char AtomName[2], double *XRayScatteringLengthOfCurrentAtom,doub
     const double FEWeight = 55.85;
     const double IWeight = 126.9;
 
-    const double HXRayScatteringLength =  1.0 * 2.82e-13;
-    const double DXRayScatteringLength =  1.0 * 2.82e-13;
-    const double CXRayScatteringLength =  6.0 * 2.82e-13;
-    const double NXRayScatteringLength =  7.0 * 2.82e-13;
-    const double OXRayScatteringLength =  8.0 * 2.82e-13;
-    const double PXRayScatteringLength = 15.0 * 2.82e-13;
-    const double SXRayScatteringLength = 16.0 * 2.82e-13;
-    const double H2OXRayScatteringLength =  10.0 * 2.82e-13;
-    const double CLXRayScatteringLength = 17.0 * 2.82e-13;
-    const double ZNXRayScatteringLength = 30.0 * 2.82e-13;
-    const double FEXRayScatteringLength = 26.0 * 2.82e-13;
-    const double CAXRayScatteringLength = 20.0 * 2.82e-13;
-    const double IXRayScatteringLength = 53.0 * 2.82e-13;
+    const double HXRayScatteringLength =  1.0 * 2.818e-13;
+    const double DXRayScatteringLength =  1.0 * 2.818e-13;
+    const double CXRayScatteringLength =  6.0 * 2.818e-13;
+    const double NXRayScatteringLength =  7.0 * 2.818e-13;
+    const double OXRayScatteringLength =  8.0 * 2.818e-13;
+    const double NAXRayScatteringLength = 11.0* 2.818e-13;
+    const double PXRayScatteringLength = 15.0 * 2.818e-13;
+    const double SXRayScatteringLength = 16.0 * 2.818e-13;
+    const double H2OXRayScatteringLength =  10.0 * 2.818e-13;
+    const double CLXRayScatteringLength = 17.0 * 2.818e-13;
+    const double ZNXRayScatteringLength = 30.0 * 2.818e-13;
+    const double FEXRayScatteringLength = 26.0 * 2.818e-13;
+    const double CAXRayScatteringLength = 20.0 * 2.818e-13;
+//    const double IXRayScatteringLength = 53.0 * 2.818e-13;
 
 
     const double HNeutronScatteringLength = -3.742e-13;
@@ -137,16 +155,16 @@ void AssignAtom(char AtomName[2], double *XRayScatteringLengthOfCurrentAtom,doub
     const double CNeutronScatteringLength = 6.6484e-13;
     const double NNeutronScatteringLength = 9.36e-13;
     const double ONeutronScatteringLength = 5.803e-13;
+    const double NANeutronScatteringLength = 3.630e-13;
     const double PNeutronScatteringLength = 5.13E-13;
     const double SNeutronScatteringLength = 2.847e-13;
-    const double CLNeutronScatteringLength = 5.13E-13;
-    const double ZNNeutronScatteringLength = 2.847e-13;
-    const double FENeutronScatteringLength = 26.0 * 2.82e-13;
-    const double CANeutronScatteringLength = 20.0 * 2.82e-13;
-    const double INeutronScatteringLength = 20.0 * 2.82e-13;
+    const double CLNeutronScatteringLength = 9.577e-13;
+    const double ZNNeutronScatteringLength = 5.680e-13;
+    const double FENeutronScatteringLength = 9.450e-13;
+    const double CANeutronScatteringLength = 4.700e-13;
+//    const double INeutronScatteringLength =  2.82e-13;
 
 
-    const double GlycanScale = 1.0;
 //    const double SNeutronScatteringLength = 10.0 * 2.82e-13;
 
 // the following if statements are to read the atoms. Note this was done in a swich statement before
@@ -205,7 +223,7 @@ void AssignAtom(char AtomName[2], double *XRayScatteringLengthOfCurrentAtom,doub
         }
         if (AtomName[0] == ' ' && AtomName[1] == 'Q' ){
           *XRayScatteringLengthOfCurrentAtom = 4.133*H2OXRayScatteringLength;
-          //*NeutronScatteringLengthOfCurrentAtom = SNeutronScatteringLength;
+          *NeutronScatteringLengthOfCurrentAtom = 4.133*H2ONeutronScatteringLength;
           *VolumeOfCurrentAtom = 4.133*(H2OVolume);
 	  *WeightOfCurrentAtom = 0.0; //4.133*(2*HWeight+OWeight);
           AtomRecg = 1;
@@ -247,6 +265,16 @@ void AssignAtom(char AtomName[2], double *XRayScatteringLengthOfCurrentAtom,doub
           *WeightOfCurrentAtom = IWeight;
 	   AtomRecg = 1;
         }
+
+	if (AtomName[0] == 'N' && AtomName[1] == 'A' ){
+          *XRayScatteringLengthOfCurrentAtom = NAXRayScatteringLength;
+          *NeutronScatteringLengthOfCurrentAtom = NANeutronScatteringLength;
+          *VolumeOfCurrentAtom = IVolume;
+          *WeightOfCurrentAtom = IWeight;
+	   AtomRecg = 1;
+        }
+
+
 	if (AtomRecg == 0){
          printf("Atom name %s not found in database\n", AtomName);
         }
@@ -265,6 +293,7 @@ void ImportAtomsFromPDBFile(char Filename[256], struct Protein ProteinStruct, in
     double zDummy;
     char Dummychar;
     char AtomName[2];
+    char AltLoc[2];
     int DummyResidueID;
     int IDOfCurrentAtom = 0;
     int LinesToPrint = 10;
@@ -274,7 +303,8 @@ void ImportAtomsFromPDBFile(char Filename[256], struct Protein ProteinStruct, in
 printf("Printing first 10 atoms read\nType, x,y,z, ResidueNo\n");
     while (fgets(Linebuffer, sizeof(Linebuffer), PointerToFile) != NULL) {
 	//                     "ATOM%*9c%c%*8c%d%*4c%lf%lf%lf%*22c%2c", &Dummychar, &ResidueID,      &xDummy, &yDummy, &zDummy, &AtomName
-        if (sscanf(Linebuffer, "ATOM%*9c%c%*8c%d%*4c%lf%lf%lf%*22c%2c", &Dummychar, &DummyResidueID, &xDummy, &yDummy, &zDummy, &AtomName[0]) == 6) {
+        if (sscanf(Linebuffer, "ATOM%*9c%c%*4c%c%*3c%d%*4c%lf%lf%lf%*22c%2c", &Dummychar, &*AltLoc, &DummyResidueID, &xDummy, &yDummy, &zDummy, &AtomName[0]) == 7) {
+	if (strcmp(" ", AltLoc)== 0 || strcmp("A", AltLoc) == 0){	
         //   printf("%d %d \n",NumberOfAtoms, IDOfCurrentAtom); 
 	    ProteinStruct.Atoms[IDOfCurrentAtom].x    = xDummy;
             ProteinStruct.Atoms[IDOfCurrentAtom].y    = yDummy;
@@ -287,9 +317,10 @@ printf("Printing first 10 atoms read\nType, x,y,z, ResidueNo\n");
 	}
             ++IDOfCurrentAtom;
         }
+	}
 	//                     "HETATM%d%*3c%c%*8c%*4c%lf%lf%lf%*22c%2c", &ResidueID,      &Dummychar, &xDummy, &yDummy, &zDummy, &AtomName
-        if (sscanf(Linebuffer, "HETATM%d%*3c%c%*8c%*4c%lf%lf%lf%*22c%2c", &DummyResidueID, &Dummychar, &xDummy, &yDummy, &zDummy, &AtomName[0]) == 6) {
-
+        if (sscanf(Linebuffer, "HETATM%d%*3c%c%*4c%c%*3c%*4c%lf%lf%lf%*22c%2c", &DummyResidueID, &*AltLoc,&Dummychar, &xDummy, &yDummy, &zDummy, &AtomName[0]) == 7) {
+	if (strcmp(" ", AltLoc)== 0 || strcmp("A", AltLoc) == 0){
 	      
 	    ProteinStruct.Atoms[IDOfCurrentAtom].x    = xDummy;
             ProteinStruct.Atoms[IDOfCurrentAtom].y    = yDummy;
@@ -306,6 +337,7 @@ printf("Printing first 10 atoms read\nType, x,y,z, ResidueNo\n");
 	}
             ++IDOfCurrentAtom;
         }
+	}
     }
 
     fclose(PointerToFile);
@@ -395,7 +427,7 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
     double yDummy;
     double zDummy;
     int NumberOfModifications = 0 ;
-	    
+    char AltLoc[2];	    
 
     int LinesToPrint = 10;
     int CountLines = 0;
@@ -412,14 +444,17 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
     while (fgets(Linebuffer, sizeof(Linebuffer), PointerToFile) != NULL) { //Read File, defined above, line by line and store it in "Linebuffer"
         ResidueID = 0;
 
-        if (sscanf(Linebuffer, "ATOM  %5d%*6c%*3c%*9c%lf%lf%lf%*22c%2c", &ResidueID, &xDummy, &yDummy, &zDummy, &*CurrentAtomName) == 5) { // This line for reading individual atoms
-	ResidueID = ResidueID ; 
-	
+        if (sscanf(Linebuffer, "ATOM  %5d%*5c%c%*3c%*9c%lf%lf%lf%*22c%2c", &ResidueID,&*AltLoc, &xDummy, &yDummy, &zDummy, &*CurrentAtomName) == 6) { // This line for reading individual atoms
+	if (strcmp(" ", AltLoc)== 0 || strcmp("A", AltLoc) == 0){	
+ResidueID = ResidueID ; 
+	}	
 	}
 
 
-	else if (sscanf(Linebuffer, "HETATM%5d%*6c%*3c%*9c%lf%lf%lf%*22c%2c", &ResidueID, &xDummy, &yDummy, &zDummy, &*CurrentAtomName) == 5) {
-	ResidueID = ResidueID ;
+	else if (sscanf(Linebuffer, "HETATM%5d%*5c%c%*3c%*9c%lf%lf%lf%*22c%2c", &ResidueID, &*AltLoc,&xDummy, &yDummy, &zDummy, &*CurrentAtomName) == 6) {
+	if (strcmp(" ", AltLoc)== 0 || strcmp("A", AltLoc) == 0){	
+ResidueID = ResidueID ;
+	}
 	}
 	else {
               fprintf(PointerToDummyPDBFile,"%s", Linebuffer);

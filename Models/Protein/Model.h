@@ -31,6 +31,10 @@ double Model(double q, double * Parameters, double * Constraints, double Contras
              
 	      if (strcmp(CurrentResidue.Name, "WAT") == 0 ) {
                  				CurrentResidue.Volume = CurrentResidue.Volume*(1./(1.+Parameters[HYDR]));
+						if (Contrast >= 0.0 && Contrast <= 100.0) {
+						
+						CurrentResidue.NeutronScatteringLength = 4.133 *(2*((Contrast* 6.671e-13 / 100.) +  ((100.-Contrast)* -3.741e-13 / 100.)) + 5.803); 
+						}
 	      }
 
               if (strcmp(CurrentResidue.Name,  "  X") == 0 ) {
@@ -66,7 +70,7 @@ double Model(double q, double * Parameters, double * Constraints, double Contras
         Scaling    = Parameters[SCALECONC] * Parameters[SCALEX];
         Background = Parameters[BACKX];
     }
-    Intensity = ConcentrationOfSample*Scaling*(Intensity);
-    Intensity = Intensity  - Background;     
+    Intensity = Scaling*(Intensity)*ConcentrationOfSample; //;/pow(2.818E-13,2)
+    Intensity = Intensity- Background;     
     return Intensity;
 }
