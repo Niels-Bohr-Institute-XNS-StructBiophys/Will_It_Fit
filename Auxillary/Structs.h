@@ -75,3 +75,9 @@ struct Protein {
     int NumberOfResidues;
     char PDBFileLocation[256];
 };
+
+struct  Ensemble{
+    struct Protein * Proteins;
+    double * Weights;
+    char ENSFileLocation[256];
+};

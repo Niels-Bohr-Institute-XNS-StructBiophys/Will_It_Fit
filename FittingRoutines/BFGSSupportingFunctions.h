@@ -1,6 +1,6 @@
 /// Function for computing chisqaure for a given set of parameters
 double ComputeChiSquare(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Parameters, int NumberOfParameters, int NumberOfSmearingFolds, double * VolumesOfMolecules,
-                        struct Protein ProteinStructure, struct UserDefined * UserDefinedStructure, int TotalNumberOfDatapoints, int NumberOfFreeParameters)
+                        struct Protein * Ensemble, int NumberOfProteins, double * ProteinWeights, struct UserDefined * UserDefinedStructure, int TotalNumberOfDatapoints, int NumberOfFreeParameters)
 {
     // Declarations
     double ChiSquare = 0.0;
@@ -8,6 +8,7 @@ double ComputeChiSquare(struct Dataset * Data, int NumberOfSpectra, struct Param
     int i;
     int j;
     int k;
+    int p;
 
     double q;
     double DummyQ;
@@ -16,9 +17,11 @@ double ComputeChiSquare(struct Dataset * Data, int NumberOfSpectra, struct Param
     double Intensity;
     double DummyParameters[NumberOfParameters];
     double SigmaOfQ;
+    double Weight;
 
     struct UserDefined UserDefinedCopy;
     struct Protein ProteinStructureCopy;
+    struct Protein ProteinStructure;
 
     // Generate parameter array
     for (i = 0; i < NumberOfParameters; ++i) {
@@ -26,88 +29,96 @@ double ComputeChiSquare(struct Dataset * Data, int NumberOfSpectra, struct Param
     }
 
     // Compute constraints and elliptic distribution for each dataset
+    
     for (i = 0; i < NumberOfSpectra; ++i) {
-        ComputeConstraints(DummyParameters, VolumesOfMolecules, Data[i].ScatteringLengths, Data[i].Contrast,
+        //Loop over proteins in ensemble here
+        printf("Dataset has %d points\n", Data[i].NumberOfDatapoints);
+        printf("Name of dataset: %s \n", Data[i].Filename);
+        for(p = 0; p < NumberOfProteins; ++p){
+            printf("P is % d \n", p);
+            ProteinStructure = Ensemble[p];
+            printf("Residues: %f Atoms: %f \n", ProteinStructure.NumberOfResidues, ProteinStructure.NumberOfAtoms);
+            Weight = ProteinWeights[i];
+            ComputeConstraints(DummyParameters, VolumesOfMolecules, Data[i].ScatteringLengths, Data[i].Contrast,
                            Data[i].Concentration, Data[i].Constraints, ProteinStructure, &*UserDefinedStructure);
+            //printf("Constraints computed\n");
+            #pragma omp parallel for schedule(dynamic) private(q, j, k, Intensity, Stepsize, DummyQ, DifferenceInIntensity, ProteinStructureCopy, UserDefinedCopy, SigmaOfQ)
+            for (j = Data[i].NMin; j < Data[i].NMax; ++j) {
+                q = Data[i].QValues[j];
 
-        #pragma omp parallel for schedule(dynamic) private(q, j, k, Intensity, Stepsize, DummyQ, DifferenceInIntensity, ProteinStructureCopy, UserDefinedCopy, SigmaOfQ)
-        for (j = Data[i].NMin; j < Data[i].NMax; ++j) {
-            q = Data[i].QValues[j];
+                InitializeUserDefinedStructure(&UserDefinedCopy);
+                CopyUserDefined(&*UserDefinedStructure, &UserDefinedCopy);
+                //This block should maybe be before the q loop?   
+    		  	if (ProteinStructure.NumberOfAtoms != 0) {
+                    ProteinStructureCopy.NumberOfAtoms    = ProteinStructure.NumberOfAtoms;
+                    ProteinStructureCopy.NumberOfResidues = ProteinStructure.NumberOfResidues;
+                    sprintf(ProteinStructureCopy.PDBFileLocation, "%s", ProteinStructure.PDBFileLocation);
+                    //printf("The error is here:\n");
+                    AllocateProteinStructure(&ProteinStructureCopy, ProteinStructureCopy.NumberOfResidues, ProteinStructureCopy.NumberOfAtoms);
+                    //printf("Allocation done");
+                    for (k = 0; k < ProteinStructureCopy.NumberOfResidues; ++k) {
+                        ProteinStructureCopy.Residues[k].xVolume = ProteinStructure.Residues[k].xVolume;
+                        ProteinStructureCopy.Residues[k].yVolume = ProteinStructure.Residues[k].yVolume;
+                        ProteinStructureCopy.Residues[k].zVolume = ProteinStructure.Residues[k].zVolume;
 
-            InitializeUserDefinedStructure(&UserDefinedCopy);
-            CopyUserDefined(&*UserDefinedStructure, &UserDefinedCopy);
+                        ProteinStructureCopy.Residues[k].xXRayScattering = ProteinStructure.Residues[k].xXRayScattering;
+                        ProteinStructureCopy.Residues[k].yXRayScattering = ProteinStructure.Residues[k].yXRayScattering;
+                        ProteinStructureCopy.Residues[k].zXRayScattering = ProteinStructure.Residues[k].zXRayScattering;
 
-			if (ProteinStructure.NumberOfAtoms != 0) {
-                ProteinStructureCopy.NumberOfAtoms    = ProteinStructure.NumberOfAtoms;
-                ProteinStructureCopy.NumberOfResidues = ProteinStructure.NumberOfResidues;
-                sprintf(ProteinStructureCopy.PDBFileLocation, "%s", ProteinStructure.PDBFileLocation);
+                        ProteinStructureCopy.Residues[k].xNeutronScattering = ProteinStructure.Residues[k].xNeutronScattering;
+                        ProteinStructureCopy.Residues[k].yNeutronScattering = ProteinStructure.Residues[k].yNeutronScattering;
+                        ProteinStructureCopy.Residues[k].zNeutronScattering = ProteinStructure.Residues[k].zNeutronScattering;
 
-                AllocateProteinStructure(&ProteinStructureCopy, ProteinStructureCopy.NumberOfResidues, ProteinStructureCopy.NumberOfAtoms);
+                        ProteinStructureCopy.Residues[k].XRayScatteringLength    = ProteinStructure.Residues[k].XRayScatteringLength;
+                        ProteinStructureCopy.Residues[k].NeutronScatteringLength = ProteinStructure.Residues[k].NeutronScatteringLength;
+                        ProteinStructureCopy.Residues[k].Volume                  = ProteinStructure.Residues[k].Volume;
+                        ProteinStructureCopy.Residues[k].ResidueID               = ProteinStructure.Residues[k].ResidueID;
 
-                for (k = 0; k < ProteinStructureCopy.NumberOfResidues; ++k) {
-                    ProteinStructureCopy.Residues[k].xVolume = ProteinStructure.Residues[k].xVolume;
-                    ProteinStructureCopy.Residues[k].yVolume = ProteinStructure.Residues[k].yVolume;
-                    ProteinStructureCopy.Residues[k].zVolume = ProteinStructure.Residues[k].zVolume;
-
-                    ProteinStructureCopy.Residues[k].xXRayScattering = ProteinStructure.Residues[k].xXRayScattering;
-                    ProteinStructureCopy.Residues[k].yXRayScattering = ProteinStructure.Residues[k].yXRayScattering;
-                    ProteinStructureCopy.Residues[k].zXRayScattering = ProteinStructure.Residues[k].zXRayScattering;
-
-                    ProteinStructureCopy.Residues[k].xNeutronScattering = ProteinStructure.Residues[k].xNeutronScattering;
-                    ProteinStructureCopy.Residues[k].yNeutronScattering = ProteinStructure.Residues[k].yNeutronScattering;
-                    ProteinStructureCopy.Residues[k].zNeutronScattering = ProteinStructure.Residues[k].zNeutronScattering;
-
-                    ProteinStructureCopy.Residues[k].XRayScatteringLength    = ProteinStructure.Residues[k].XRayScatteringLength;
-                    ProteinStructureCopy.Residues[k].NeutronScatteringLength = ProteinStructure.Residues[k].NeutronScatteringLength;
-                    ProteinStructureCopy.Residues[k].Volume                  = ProteinStructure.Residues[k].Volume;
-                    ProteinStructureCopy.Residues[k].ResidueID               = ProteinStructure.Residues[k].ResidueID;
-
-                    strcpy(ProteinStructureCopy.Residues[k].Name, ProteinStructure.Residues[k].Name);
-                }
-
-                for (k = 0; k < ProteinStructureCopy.NumberOfAtoms; ++k) {
-                    ProteinStructureCopy.Atoms[k].x = ProteinStructure.Atoms[k].x;
-                    ProteinStructureCopy.Atoms[k].y = ProteinStructure.Atoms[k].y;
-                    ProteinStructureCopy.Atoms[k].z = ProteinStructure.Atoms[k].z;
-
-                    ProteinStructureCopy.Atoms[k].XRayScatteringLength    = ProteinStructure.Atoms[k].XRayScatteringLength;
-                    ProteinStructureCopy.Atoms[k].NeutronScatteringLength = ProteinStructure.Atoms[k].NeutronScatteringLength;
-                    ProteinStructureCopy.Atoms[k].Volume                  = ProteinStructure.Atoms[k].Volume;
-					ProteinStructureCopy.Atoms[k].Name                    = ProteinStructure.Atoms[k].Name;
-                }
-			}
-
-            if (Data[i].IncludeResolutionEffects == true) {
-                Intensity = 0.0;
-                SigmaOfQ  = Data[i].SigmaQValues[j];
-                Stepsize  = 6.0 * SigmaOfQ / (1.0 * NumberOfSmearingFolds);
-
-                for (k = 0; k < NumberOfSmearingFolds; ++k) {
-                    DummyQ = q + (k + 0.5 - NumberOfSmearingFolds / 2.0) * Stepsize;
-
-                    if (DummyQ < 1e-5) {
-                        DummyQ = 1e-5;
+                        strcpy(ProteinStructureCopy.Residues[k].Name, ProteinStructure.Residues[k].Name);
                     }
 
-                    Intensity += Model(DummyQ, DummyParameters, Data[i].Constraints, Data[i].Contrast, ProteinStructureCopy, &UserDefinedCopy) * Data[i].ResolutionWeights[j][k];
+                    for (k = 0; k < ProteinStructureCopy.NumberOfAtoms; ++k) {
+                        ProteinStructureCopy.Atoms[k].x = ProteinStructure.Atoms[k].x;
+                        ProteinStructureCopy.Atoms[k].y = ProteinStructure.Atoms[k].y;
+                        ProteinStructureCopy.Atoms[k].z = ProteinStructure.Atoms[k].z;
+
+                        ProteinStructureCopy.Atoms[k].XRayScatteringLength    = ProteinStructure.Atoms[k].XRayScatteringLength;
+                        ProteinStructureCopy.Atoms[k].NeutronScatteringLength = ProteinStructure.Atoms[k].NeutronScatteringLength;
+                        ProteinStructureCopy.Atoms[k].Volume                  = ProteinStructure.Atoms[k].Volume;
+                        ProteinStructureCopy.Atoms[k].Name                    = ProteinStructure.Atoms[k].Name;
+                    }
+    		  	}
+                if (Data[i].IncludeResolutionEffects == true) {
+                    Intensity = 0.0;
+                    SigmaOfQ  = Data[i].SigmaQValues[j];
+                    Stepsize  = 6.0 * SigmaOfQ / (1.0 * NumberOfSmearingFolds);
+
+                    for (k = 0; k < NumberOfSmearingFolds; ++k) {
+                        DummyQ = q + (k + 0.5 - NumberOfSmearingFolds / 2.0) * Stepsize;
+    
+                        if (DummyQ < 1e-5) {
+                            DummyQ = 1e-5;
+                        }
+    
+                        Intensity += Weight*Model(DummyQ, DummyParameters, Data[i].Constraints, Data[i].Contrast, ProteinStructureCopy, &UserDefinedCopy) * Data[i].ResolutionWeights[j][k];
+                    }
+                } else {
+                    Intensity += Weight*Model(q, DummyParameters, Data[i].Constraints, Data[i].Contrast, ProteinStructureCopy, &UserDefinedCopy);
                 }
-            } else {
-                Intensity = Model(q, DummyParameters, Data[i].Constraints, Data[i].Contrast, ProteinStructureCopy, &UserDefinedCopy);
+                Data[i].FitValues[j] = Intensity;
+                DifferenceInIntensity = Data[i].IValues[j] - Intensity;
+    
+                #pragma omp atomic
+                ChiSquare += Weight*(DifferenceInIntensity * DifferenceInIntensity * Data[i].SigmaValues[j] / (1.0 * (TotalNumberOfDatapoints - NumberOfFreeParameters)));
+    
+                FreeUserDefined(&UserDefinedCopy);
+    
+                if (ProteinStructure.NumberOfAtoms != 0) {
+                    free(ProteinStructureCopy.Residues);
+                    free(ProteinStructureCopy.Atoms);
+                }
             }
-
-            Data[i].FitValues[j] = Intensity;
-            DifferenceInIntensity = Data[i].IValues[j] - Intensity;
-
-            #pragma omp atomic
-            ChiSquare += DifferenceInIntensity * DifferenceInIntensity * Data[i].SigmaValues[j] / (1.0 * (TotalNumberOfDatapoints - NumberOfFreeParameters));
-
-            FreeUserDefined(&UserDefinedCopy);
-
-            if (ProteinStructure.NumberOfAtoms != 0) {
-                free(ProteinStructureCopy.Residues);
-                free(ProteinStructureCopy.Atoms);
-            }
-        }
+        }    
     }
 
     return ChiSquare;
@@ -115,8 +126,8 @@ double ComputeChiSquare(struct Dataset * Data, int NumberOfSpectra, struct Param
 
 /// Compute the gradient for a given point
 void ComputeGradient(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Parameters, int NumberOfParameters, int NumberOfSmearingFolds, double * VolumesOfMolecules,
-                     struct Protein ProteinStructure, struct UserDefined * UserDefinedStructure, double * Gradient, double DeltaForDifferentiations, int TotalNumberOfDatapoints,
-                     int NumberOfFreeParameters)
+                    struct Protein * Ensemble, int NumberOfProteins, double * ProteinWeights, struct UserDefined * UserDefinedStructure, double * Gradient,
+                    double DeltaForDifferentiations, int TotalNumberOfDatapoints, int NumberOfFreeParameters)
 {
     // Declarations
     int i;
@@ -142,14 +153,14 @@ void ComputeGradient(struct Dataset * Data, int NumberOfSpectra, struct Paramete
 
             Parameters[i].Value += dParameter;
 
-            ChiSquarePlus  = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure,
-                                              &*UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
+            ChiSquarePlus  = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins,
+                                            ProteinWeights, &*UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
 
             Parameters[i].Value = InitialValueOfParameter;
             Parameters[i].Value -= dParameter;
 
-            ChiSquareMinus = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure,
-                                              &*UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
+            ChiSquareMinus = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins,
+                                            ProteinWeights, &*UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
 
             Parameters[i].Value = InitialValueOfParameter;
             Gradient[i] = (ChiSquarePlus - ChiSquareMinus) / (2.0 * dParameter);
@@ -159,8 +170,8 @@ void ComputeGradient(struct Dataset * Data, int NumberOfSpectra, struct Paramete
 
 /// Perform linesearch (lnsrch from Numerical Recipes)
 double PerformLinesearch(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Parameters, int NumberOfParameters, int NumberOfSmearingFolds,
-                         double * VolumesOfMolecules, struct Protein ProteinStructure, struct UserDefined * UserDefinedStructure, double OriginalValue, double * Gradient,
-                         double * Direction, struct Parameter * NewParameters, double MaxStepSize, int TotalNumberOfDatapoints, int NumberOfFreeParameters)
+                         double * VolumesOfMolecules, struct Protein * Ensemble, int NumberOfProteins, double * ProteinWeights, struct UserDefined * UserDefinedStructure, double OriginalValue,
+                         double * Gradient, double * Direction, struct Parameter * NewParameters, double MaxStepSize, int TotalNumberOfDatapoints, int NumberOfFreeParameters)
 {
     // Convergence declarations
     const double Alpha = 1e-4;
@@ -239,8 +250,8 @@ double PerformLinesearch(struct Dataset * Data, int NumberOfSpectra, struct Para
             NewParameters[i].Value = Parameters[i].Value + Lambda * Direction[i];
         }
 
-        CurrentValue = ComputeChiSquare(Data, NumberOfSpectra, NewParameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure,
-                                        TotalNumberOfDatapoints, NumberOfFreeParameters);
+        CurrentValue = ComputeChiSquare(Data, NumberOfSpectra, NewParameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins,
+                                    ProteinWeights, &*UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
 
         if (Lambda < LambdaMin) {
 

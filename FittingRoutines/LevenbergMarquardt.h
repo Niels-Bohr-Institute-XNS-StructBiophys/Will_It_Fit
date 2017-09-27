@@ -1,6 +1,6 @@
 int LevenbergMarquardt(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Parameters, int NumberOfParameters, int MaxIterations, double *ChiXX,
-                       int NumberOfSmearingFolds, double * VolumesOfMolecules, bool UseGridsearchRoutine, bool PrintCovarianceMatrix, struct Protein ProteinStructure,
-                       struct UserDefined * UserDefinedStructure, double DeltaForDifferentiations, int NumberOfSampleInformations, int TotalNumberOfDatapoints,
+                       int NumberOfSmearingFolds, double * VolumesOfMolecules, bool UseGridsearchRoutine, bool PrintCovarianceMatrix, struct Protein * Ensemble, int NumberOfProteins, 
+                       double * ProteinWeights, struct UserDefined * UserDefinedStructure, double DeltaForDifferentiations, int NumberOfSampleInformations, int TotalNumberOfDatapoints,
                        int NumberOfFreeParameters, int HighestNumberOfDatapoints)
 {
     // Declarations
@@ -29,9 +29,9 @@ int LevenbergMarquardt(struct Dataset * Data, int NumberOfSpectra, struct Parame
             }
         }
 
-        RunLevenbergMarquardt(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure,
-                              DeltaForDifferentiations, CovarianceMatrix, AlphaMatrix, &Lambda, &Chisquare, Beta, NumberOfSampleInformations, TotalNumberOfDatapoints,
-                              NumberOfFreeParameters, HighestNumberOfDatapoints);
+        RunLevenbergMarquardt(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins, ProteinWeights,
+                            &*UserDefinedStructure,DeltaForDifferentiations, CovarianceMatrix, AlphaMatrix, &Lambda, &Chisquare, Beta, NumberOfSampleInformations,
+                            TotalNumberOfDatapoints, NumberOfFreeParameters, HighestNumberOfDatapoints);
 
         ++i;
 
@@ -63,17 +63,17 @@ int LevenbergMarquardt(struct Dataset * Data, int NumberOfSpectra, struct Parame
         printf("Estimating errors on refined parameters...\n\n");
     }
 
-    RunLevenbergMarquardt(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure,
-                          DeltaForDifferentiations, CovarianceMatrix, AlphaMatrix, &DummyLambda, &Chisquare, Beta, NumberOfSampleInformations, TotalNumberOfDatapoints,
-                          NumberOfFreeParameters, HighestNumberOfDatapoints);
+    RunLevenbergMarquardt(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins, ProteinWeights,
+                            &*UserDefinedStructure,DeltaForDifferentiations, CovarianceMatrix, AlphaMatrix, &Lambda, &Chisquare, Beta, NumberOfSampleInformations,
+                            TotalNumberOfDatapoints, NumberOfFreeParameters, HighestNumberOfDatapoints);
 
     for (i = 0; i < NumberOfParameters; ++i) {
         Parameters[i].Error = sqrt(CovarianceMatrix[i][i]);
     }
 
     // Conclude algorithm
-    Chisquare = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure,
-                                 TotalNumberOfDatapoints, NumberOfFreeParameters);
+    Chisquare = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins,
+                                ProteinWeights, &*UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
 
     *ChiXX = Chisquare;
 

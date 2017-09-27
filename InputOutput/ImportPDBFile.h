@@ -12,7 +12,6 @@ int CheckNumberOfResiduesInPDBFile(char Filename[256])
 
     // I/O
     PointerToFile = fopen(Filename, "r");
-
     if(PointerToFile == 0){
         printf("An error occured when attempting to open PDB-file. \n");
         return -1;
@@ -174,7 +173,7 @@ void ImportAtomsFromPDBFile(char Filename[256], struct Protein ProteinStruct, in
 void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct, int NumberOfResidues)
 {
     // Declarations
-    FILE *PointerToFile;
+    FILE *fp;
     char Linebuffer[256];
     char AtomName;
     char Dummychar;
@@ -232,16 +231,12 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
     const double SNeutronScatteringLength = 2.847e-13;
 
     // I/O
-    PointerToFile = fopen(Filename, "r");
-
-    while (fgets(Linebuffer, sizeof(Linebuffer), PointerToFile) != NULL) {
+    fp = fopen(Filename, "r");
+    while (fgets(Linebuffer, sizeof(Linebuffer), fp) != NULL) {
         ResidueID = 0;
-
         if (sscanf(Linebuffer, "ATOM%*9c%c%*8c%d%*4c%lf%lf%lf%*23c%c", &Dummychar, &ResidueID, &xDummy, &yDummy, &zDummy, &AtomName) == 6) {
         }
-
         if (ResidueID != PreviousResidueID) {
-
             if (PreviousResidueID != 0) {
                 ProteinStruct.Residues[IDOfCurrentResidue].Volume = VolumeOfResidue;
                 ProteinStruct.Residues[IDOfCurrentResidue].XRayScatteringLength = XRayScatteringLengthOfResidue;
@@ -360,6 +355,5 @@ void ImportResiduesFromPDBFile(char Filename[256], struct Protein ProteinStruct,
         yCenterOfNeutronScattering += NeutronScatteringLengthOfCurrentAtom * yDummy;
         zCenterOfNeutronScattering += NeutronScatteringLengthOfCurrentAtom * zDummy;
     }
-
-    fclose(PointerToFile);
+    fclose(fp);
 }

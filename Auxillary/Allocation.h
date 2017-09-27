@@ -29,6 +29,23 @@ void AllocateProteinStructure(struct Protein * ProteinStructure, int NumberOfRes
     ProteinStructure->Atoms    = (struct Atom *)    calloc(NumberOfAtoms,    sizeof(struct Atom));
 }
 
+void AllocateEnsemble(struct Protein ** Ensemble, int NumberOfProteins, int * ProteinResidues, int * ProteinAtoms){
+
+    //Declaration
+    int i;
+    struct Protein * DummyEnsemble;
+
+    // Initialization
+    DummyEnsemble = (struct Protein *) calloc(NumberOfProteins, sizeof(struct Protein));
+    // Allocate memory for each 
+    for (i = 0; i < NumberOfProteins; ++i)
+    {
+        AllocateProteinStructure(&DummyEnsemble[i], ProteinResidues[i], ProteinAtoms[i]);
+    }
+
+    *Ensemble = DummyEnsemble;
+}
+
 /// Functions used to allocate memory for arrays
 void Initialize1DArray(double ** Array, int Length)
 {

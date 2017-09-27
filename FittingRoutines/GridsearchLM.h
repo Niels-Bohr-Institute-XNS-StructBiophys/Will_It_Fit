@@ -1,7 +1,7 @@
 int GridsearchLM(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Parameters, int NumberOfParameters, int MaxIterations, double *ChiXX, int NumberOfSmearingFolds,
-                 double * VolumesOfMolecules, int NumberOfCyclesInGridsearch, struct Protein ProteinStructure, struct UserDefined * UserDefinedStructure,
-                 double DeltaForDifferentiations, bool Printout, int NumberOfSampleInformations, int TotalNumberOfDatapoints, int NumberOfFreeParameters,
-                 int HighestNumberOfDatapoints)
+                 double * VolumesOfMolecules, int NumberOfCyclesInGridsearch, struct Protein * Ensemble, int NumberOfProteins, double * ProteinWeights,
+                 struct UserDefined * UserDefinedStructure, double DeltaForDifferentiations, bool Printout, int NumberOfSampleInformations, int TotalNumberOfDatapoints,
+                 int NumberOfFreeParameters, int HighestNumberOfDatapoints)
 {
     // Variables used in iterations
     int i;
@@ -37,8 +37,8 @@ int GridsearchLM(struct Dataset * Data, int NumberOfSpectra, struct Parameter * 
 
     NumberOfCycles = NumberOfCyclesInGridsearch;
     NumberOfParametersToFit = 0;
-    BestChisquare = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure,
-                                     TotalNumberOfDatapoints, NumberOfFreeParameters);
+    BestChisquare = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins,
+                                    ProteinWeights, &*UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
 
     ChiXXDummy = BestChisquare;
 
@@ -64,8 +64,8 @@ int GridsearchLM(struct Dataset * Data, int NumberOfSpectra, struct Parameter * 
             PreviousChiXXDummy = ChiXXDummy;
 
             LevenbergMarquardt(Data, NumberOfSpectra, DummyParameters, NumberOfParameters, MaxIterations, &ChiXXDummy, NumberOfSmearingFolds, VolumesOfMolecules, true, false,
-                               ProteinStructure, &*UserDefinedStructure, DeltaForDifferentiations, NumberOfSampleInformations, TotalNumberOfDatapoints, NumberOfFreeParameters,
-                               HighestNumberOfDatapoints);
+                               Ensemble, NumberOfProteins, ProteinWeights, &*UserDefinedStructure, DeltaForDifferentiations, NumberOfSampleInformations, TotalNumberOfDatapoints,
+                               NumberOfFreeParameters, HighestNumberOfDatapoints);
 
             DummyParameters[ParametersToFit[j]].iParameter = false;
 
@@ -90,8 +90,8 @@ int GridsearchLM(struct Dataset * Data, int NumberOfSpectra, struct Parameter * 
     }
 
     // Conclusion
-    *ChiXX = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure,
-                              TotalNumberOfDatapoints, NumberOfFreeParameters);
+    *ChiXX = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins, 
+        ProteinWeights, &*UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
 
     if (Printout == true) {
         printf("\n");

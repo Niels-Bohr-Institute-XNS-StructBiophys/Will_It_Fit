@@ -32,11 +32,14 @@ double Model(double q, double * Parameters, double * Constraints, double Contras
         Scaling    = Parameters[7] * Parameters[8];
         Background = Parameters[6];
     }
-    
+    //printf("Contrast computed \n");
     // Construct complex matrix
     for(j = 0; j < ProteinStructure.NumberOfResidues; j++){
+        //printf("Residue nr: %d \n", j);
         CopyResidue(&ProteinStructure.Residues[j], &CurrentResidue);
+        //printf("Residues copied\n");
 		AddScatteringFromResidue(Beta, q, CurrentResidue, Contrast, ScatteringLengthDensityOfWater);
+        //printf("Scattering added\n");
     }
    
     // Calculate intensity

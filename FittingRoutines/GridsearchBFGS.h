@@ -1,6 +1,6 @@
 int GridsearchBFGS(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Parameters, int NumberOfParameters, int MaxIterations, double *ChiXX, int NumberOfSmearingFolds,
-                   double * VolumesOfMolecules, int NumberOfCyclesInGridsearch, struct Protein ProteinStructure, struct UserDefined * UserDefinedStructure,
-                   double DeltaForDifferentiations, bool PrintOut, int TotalNumberOfDatapoints, int NumberOfFreeParameters)
+                double * VolumesOfMolecules, int NumberOfCyclesInGridsearch, struct Protein * Ensemble, int NumberOfProteins, double * ProteinWeights,
+                struct UserDefined * UserDefinedStructure, double DeltaForDifferentiations, bool PrintOut, int TotalNumberOfDatapoints, int NumberOfFreeParameters)
 {
     // Variables used in iterations
     int i;
@@ -56,8 +56,8 @@ int GridsearchBFGS(struct Dataset * Data, int NumberOfSpectra, struct Parameter 
             DummyParameters[ParametersToFit[j]].iParameter = true;
             StartingValue = DummyParameters[ParametersToFit[j]].Value;
 
-            BFGS(Data, NumberOfSpectra, DummyParameters, NumberOfParameters, MaxIterations, &ChiXXDummy, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure,
-                 &*UserDefinedStructure, DeltaForDifferentiations, true, TotalNumberOfDatapoints, NumberOfFreeParameters);
+            BFGS(Data, NumberOfSpectra, DummyParameters, NumberOfParameters, MaxIterations, &ChiXXDummy, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins,
+            ProteinWeights, &*UserDefinedStructure, DeltaForDifferentiations, true, TotalNumberOfDatapoints, NumberOfFreeParameters);
 
             DummyParameters[ParametersToFit[j]].iParameter = false;
 
@@ -81,8 +81,8 @@ int GridsearchBFGS(struct Dataset * Data, int NumberOfSpectra, struct Parameter 
     }
 
     // Conclusion
-    *ChiXX = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure,
-                              TotalNumberOfDatapoints, NumberOfFreeParameters);
+    *ChiXX = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins, ProteinWeights,
+                            &*UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
 
     if (PrintOut == true) {
         printf("\n");

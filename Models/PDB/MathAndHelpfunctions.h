@@ -85,7 +85,11 @@ void AddScatteringFromResidue(double complex **Beta, double q, struct Residue Cu
 	double Theta;
 	double Phi;
     
-    double Legendre[NumberOfHarmonics + 1];
+    int LegendreSize =  gsl_sf_legendre_array_n(NumberOfHarmonics);
+    int LegendreIndex;
+    const int LegendreMode = 3;
+    double Legendre[LegendreSize];
+
     double Bessel[NumberOfHarmonics + 1];
     double ScatteringLengthOfResidue; 
 	double ScatteringLengthOfDisplacedSolvent = CurrentResidue.Volume * ScatteringLengthDensityOfSolvent;
@@ -106,20 +110,34 @@ void AddScatteringFromResidue(double complex **Beta, double q, struct Residue Cu
        y = (CurrentResidue.yNeutronScattering * ScatteringLengthOfResidue - CurrentResidue.yVolume * ScatteringLengthOfDisplacedSolvent) / ExcessScatteringLength;
        z = (CurrentResidue.zNeutronScattering * ScatteringLengthOfResidue - CurrentResidue.zVolume * ScatteringLengthOfDisplacedSolvent) / ExcessScatteringLength;
     }
-
+    
+    if(x != x|| y != y || z != z){//This is a filthy filthy hack. I feel bad.
+        x = 0.0;
+        y = 0.0;
+        z = 0.0;
+        /*if (ScatteringLengthDensityOfSolvent == 0.0)
+        {
+            printf("Check!\n");
+        }
+        else{
+            printf("Nope!\n");
+        }*/
+        //printf("ExcessScatteringLength: %f \n", ExcessScatteringLength);
+        //printf("Volume %f \n", CurrentResidue.Volume);
+        //printf("ScatteringLengthOfResidue: %f \n", ScatteringLengthOfResidue);
+        //printf("ScatteringLengthOfDisplacedSolvent: %f \n", ScatteringLengthOfDisplacedSolvent);
+    }
     Radius = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
     Theta  = acos(z / Radius);
     Phi    = acos(x / (Radius * sin(Theta))) * Sign(y);
 
 	// Calculate spherical Bessel functions for l = 0 to NumberOfHarmonics
     gsl_sf_bessel_jl_array(NumberOfHarmonics, q * Radius, Bessel);
-
-	// Calculate Legendre polynomials P_l(cos(theta)) of degree l = m to NumberOfHarmonics - store the values in Legendre[m], Legendre[m + 1], ..., Legendre[NumberOfHarmonics]
-    for (m = 0; m < NumberOfHarmonics + 1; m++) {
-        gsl_sf_legendre_sphPlm_array(NumberOfHarmonics, m, cos(Theta), &Legendre[m]); 
-
-        for (l = m; l < NumberOfHarmonics + 1; l++) {
-            Beta[l][m] += sqrt(4.0 * M_PI) * cpow(I, l) * ExcessScatteringLength * Bessel[l] * Legendre[l] * PolarComplexNumber(1.0, -m * Phi);
+    gsl_sf_legendre_array(LegendreMode, NumberOfHarmonics, cos(Theta), Legendre); //Calculate legendre polynomials P_l(cos(theta)) of degree l=m,..., up to Nh   
+    for(m=0;m<=NumberOfHarmonics+1;m++){                                                               
+        for(l=m;l<NumberOfHarmonics+1;l++){
+            LegendreIndex = gsl_sf_legendre_array_index(l,m);
+            Beta[l][m] += sqrt(4.0 * M_PI) * cpow(I,l) * ExcessScatteringLength * Bessel[l] * Legendre[LegendreIndex] * PolarComplexNumber(1.0, -m * Phi);
         }
     }
 }

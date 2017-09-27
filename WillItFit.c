@@ -66,13 +66,13 @@
 #include "InputOutput/ImportParameters.h"
 #include "InputOutput/ImportSampleInfo.h"
 #include "InputOutput/ImportPDBFile.h"
+#include "InputOutput/ImportEnsemble.h"
 #include "InputOutput/OutputSpectra.h"
 #include "InputOutput/OutputParameters.h"
 #include "InputOutput/BetaIO.h"
 
 // Include model
 #include "Auxillary/ModelLocation.h"
-#define L_GSL 7
 
 
 // Include functions accounting for instrumental smearing
@@ -113,11 +113,18 @@ int main(int argc, char *argv[])
     // Variables describing the sample info
     char SamplesFileLocation[256];
     char PDBFileLocation[256];
+    char ENSFileLocation[256];
+
+    //Set default variables for sample info variables
+    sprintf(SamplesFileLocation, "N/A");
+    sprintf(PDBFileLocation, "N/A");
+    sprintf(ENSFileLocation, "N/A");
 
     int NumberOfSampleInformations;
     double * VolumesOfMolecules;
 
     struct Protein ProteinStructure;
+    
     struct UserDefined UserDefinedStructure;
 
     // Variables describing the parameters
@@ -152,6 +159,13 @@ int main(int argc, char *argv[])
 
     bool IncludeResolutionEffects = false;
 
+    // Variables describing the PDB ensemble
+    int ProteinsInEnsemble;
+    int * ProteinAtoms;
+    int * ProteinResidues;
+    struct Protein * Ensemble;
+    double * ProteinWeights;
+
     /// Setup errorchecking
     ReturnMessage("Program terminated before error catching.");
 
@@ -159,7 +173,7 @@ int main(int argc, char *argv[])
     /// Obtain arguments from program or request them in console
     AssignArguments(argc, argv, CardFileLocation, SamplesFileLocation, ParameterFileLocation, &QMin, &QMax, &ChooseFittingRoutine,
                     &FittingRoutineArgument2, &IncludeResolutionEffects, &NumberOfSmearingFolds, ResolutionFileLocation,
-                    &PrintCovarianceMatrix, PDBFileLocation, &ChiSquareFractile, &FittingRoutineArgument3, &CMD);
+                    &PrintCovarianceMatrix, PDBFileLocation, ENSFileLocation, &ChiSquareFractile, &FittingRoutineArgument3, &CMD);
     /// Retrieve parameters
     printf("\n");
     printf("Reading initial values of parameters. \n");
@@ -246,7 +260,49 @@ int main(int argc, char *argv[])
 
         ImportResiduesFromPDBFile(PDBFileLocation, ProteinStructure, ProteinStructure.NumberOfResidues);
         ImportAtomsFromPDBFile(PDBFileLocation, ProteinStructure, ProteinStructure.NumberOfAtoms);
+        //Allocate arrays used for ensemble
+        Initialize1DArray(&ProteinWeights, 1);
+        Initialize1DIntegerArray(&ProteinResidues, 1);
+        Initialize1DIntegerArray(&ProteinAtoms, 1);
+
+        //Assign values to ensemble
+        ProteinResidues[0] = ProteinStructure.NumberOfResidues;
+        ProteinAtoms[0] = ProteinStructure.NumberOfAtoms;
+        AllocateEnsemble(&Ensemble, 1, ProteinResidues, ProteinAtoms);
+        ProteinWeights[0] = 1.0;
+        Ensemble[0] = ProteinStructure;
+        ProteinsInEnsemble = 1;
     }
+    else if(strcmp(ENSFileLocation, "N/A") != 0){
+        ClearScreen();
+        //Check size of the ensemble
+        ProteinsInEnsemble = CheckSizeOfEnsemble(ENSFileLocation, &ProteinResidues, &ProteinAtoms, CMD);
+        //Allocate memory for the ensemble
+        AllocateEnsemble(&Ensemble, ProteinsInEnsemble, ProteinResidues, ProteinAtoms);
+        //Import of PDB files
+        ImportEnsemble(Ensemble, &ProteinWeights, ENSFileLocation, ProteinsInEnsemble, ProteinResidues, ProteinAtoms, CMD);
+        printf("Ensemble imported.\n");
+        CleanEnsemble(Ensemble, ProteinsInEnsemble);
+        //Super shitty ensemble check is located here:
+        /*
+        for(i = 0; i < ProteinsInEnsemble; i++){
+            printf("Residues: %d Atoms: %d \n", Ensemble[i].NumberOfResidues, Ensemble[i].NumberOfAtoms);
+            printf("Printing Residues\n");
+            for (j = 0; j < Ensemble[i].NumberOfResidues; ++j){
+                if(j<20){
+                    printf("%f \n", Ensemble[i].Residues[j].Volume);
+                }           
+            }
+            printf("Printing Atoms\n");
+            for (j = 0; j < Ensemble[i].NumberOfAtoms; ++j){
+                if(j<20){
+                    printf("%f \n", Ensemble[i].Atoms[j].x);
+                }
+            }
+
+        }*/
+    }
+    
 
     /// Decide fitting range and initialize the userdefined structure
     printf("\n");
@@ -275,30 +331,30 @@ int main(int argc, char *argv[])
 
     switch (ChooseFittingRoutine) {
         case 0:
-            FittingRoutineError = ComputeModel(Data, NumberOfSpectra, Parameters, NumberOfParameters, &ChiSquareRed, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure,
-                                               &UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
+            FittingRoutineError = ComputeModel(Data, NumberOfSpectra, Parameters, NumberOfParameters, &ChiSquareRed, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, ProteinsInEnsemble,
+                                                ProteinWeights,&UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
         break;
 
         case 1:
             FittingRoutineError = LevenbergMarquardt(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquareRed, NumberOfSmearingFolds,
-                                                     VolumesOfMolecules, false, PrintCovarianceMatrix, ProteinStructure, &UserDefinedStructure, DeltaForDifferentiations,
+                                                     VolumesOfMolecules, false, PrintCovarianceMatrix, Ensemble, ProteinsInEnsemble, ProteinWeights, &UserDefinedStructure, DeltaForDifferentiations,
                                                      NumberOfSampleInformations, TotalNumberOfDatapoints, NumberOfFreeParameters, HighestNumberOfDatapoints);
         break;
 
         case 2:
             FittingRoutineError = GridsearchLM(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquareRed, NumberOfSmearingFolds,
-                                               VolumesOfMolecules, FittingRoutineArgument2, ProteinStructure, &UserDefinedStructure, DeltaForDifferentiations, true,
+                                               VolumesOfMolecules, FittingRoutineArgument2, Ensemble, ProteinsInEnsemble, ProteinWeights, &UserDefinedStructure, DeltaForDifferentiations, true,
                                                NumberOfSampleInformations, TotalNumberOfDatapoints, NumberOfFreeParameters, HighestNumberOfDatapoints);
         break;
 
         case 3:
             FittingRoutineError = BFGS(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquareRed, NumberOfSmearingFolds, VolumesOfMolecules,
-                                       ProteinStructure, &UserDefinedStructure, DeltaForDifferentiations, false, TotalNumberOfDatapoints, NumberOfFreeParameters);
+                                       Ensemble, ProteinsInEnsemble, ProteinWeights, &UserDefinedStructure, DeltaForDifferentiations, false, TotalNumberOfDatapoints, NumberOfFreeParameters);
         break;
 
         case 4:
             FittingRoutineError = GridsearchBFGS(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquareRed, NumberOfSmearingFolds,
-                                                 VolumesOfMolecules, FittingRoutineArgument2, ProteinStructure, &UserDefinedStructure, DeltaForDifferentiations, true,
+                                                 VolumesOfMolecules, FittingRoutineArgument2, Ensemble, ProteinsInEnsemble, ProteinWeights, &UserDefinedStructure, DeltaForDifferentiations, true,
                                                  TotalNumberOfDatapoints, NumberOfFreeParameters);
         break;
 
@@ -316,16 +372,15 @@ int main(int argc, char *argv[])
 
         case 7:
             FittingRoutineError = ProfileLikelihood(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquareRed, NumberOfSmearingFolds,
-                                                    VolumesOfMolecules, ProteinStructure, &UserDefinedStructure, DeltaForDifferentiations, ChiSquareFractile,  FittingRoutineArgument3,
+                                                    VolumesOfMolecules, Ensemble, ProteinsInEnsemble, ProteinWeights, &UserDefinedStructure, DeltaForDifferentiations, ChiSquareFractile,  FittingRoutineArgument3,
                                                     CardFileLocation, NumberOfSampleInformations, TotalNumberOfDatapoints, NumberOfFreeParameters, HighestNumberOfDatapoints);
         break;
 
         case 8:
             FittingRoutineError = ProfileLikelihoodSingleParameter(Data, NumberOfSpectra, Parameters, NumberOfParameters, FittingRoutineArgument1, &ChiSquareRed, NumberOfSmearingFolds,
-                                                                   VolumesOfMolecules, ProteinStructure, &UserDefinedStructure, DeltaForDifferentiations, ChiSquareFractile,
+                                                                   VolumesOfMolecules, Ensemble, ProteinsInEnsemble, ProteinWeights, &UserDefinedStructure, DeltaForDifferentiations, ChiSquareFractile,
                                                                    FittingRoutineArgument3, CardFileLocation, FittingRoutineArgument2, NumberOfSampleInformations,
                                                                    TotalNumberOfDatapoints, NumberOfFreeParameters, HighestNumberOfDatapoints);
-        break;
     }
 
     Errorcheck(FittingRoutineError, "running the selected fitting routine");

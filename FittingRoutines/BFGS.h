@@ -1,6 +1,6 @@
 int BFGS(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Parameters, int NumberOfParameters, int MaxIterations, double * ChiXX, int NumberOfSmearingFolds,
-         double * VolumesOfMolecules, struct Protein ProteinStructure, struct UserDefined * UserDefinedStructure, double DeltaForDifferentiations, bool Gridsearching,
-         int TotalNumberOfDatapoints, int NumberOfFreeParameters)
+        double * VolumesOfMolecules, struct Protein * Ensemble, int NumberOfProteins, double * ProteinWeights, struct UserDefined * UserDefinedStructure, double DeltaForDifferentiations,
+        bool Gridsearching, int TotalNumberOfDatapoints, int NumberOfFreeParameters)
 {
     // Declaration of dummy variables
     double Dummy1;
@@ -39,11 +39,11 @@ int BFGS(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Paramete
     double SumOverDeltaParameters;
 
     // Calculate initial value and gradient
-    ChiSquare = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure,
-                                 TotalNumberOfDatapoints, NumberOfFreeParameters);
+    ChiSquare = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins, ProteinWeights,
+                                &*UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
 
-    ComputeGradient(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure, Gradient,
-                    DeltaForDifferentiations, TotalNumberOfDatapoints, NumberOfFreeParameters);
+    ComputeGradient(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins, ProteinWeights, 
+                &*UserDefinedStructure, Gradient, DeltaForDifferentiations, TotalNumberOfDatapoints, NumberOfFreeParameters);
 
     // Initialize the Hessian matrix (as the identity matrix)
     for (i = 0; i < NumberOfParameters; ++i) {
@@ -84,8 +84,8 @@ int BFGS(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Paramete
         ++i;
 
         // Search the gradient for the best step to take
-        ChiSquare = PerformLinesearch(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure,
-                                      &*UserDefinedStructure, ChiSquare, Gradient, DeltaParameters, NewParameters, MaxStep, TotalNumberOfDatapoints, NumberOfFreeParameters);
+        ChiSquare = PerformLinesearch(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins,
+                                    ProteinWeights, &*UserDefinedStructure, ChiSquare, Gradient, DeltaParameters, NewParameters, MaxStep, TotalNumberOfDatapoints, NumberOfFreeParameters);
 
         for (j = 0; j < NumberOfParameters; ++j) {
             DeltaParameters[j] = NewParameters[j].Value - Parameters[j].Value;
@@ -129,8 +129,8 @@ int BFGS(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Paramete
             OldGradient[j] = Gradient[j];
         }
 
-        ComputeGradient(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure, Gradient,
-                        DeltaForDifferentiations, TotalNumberOfDatapoints, NumberOfFreeParameters);
+        ComputeGradient(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins,
+                    ProteinWeights, &*UserDefinedStructure, Gradient, DeltaForDifferentiations, TotalNumberOfDatapoints, NumberOfFreeParameters);
 
         // Compute tolerance
         Dummy1 = 0.0;
@@ -229,8 +229,8 @@ int BFGS(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Paramete
     }
 
 Conclusion:
-    ChiSquare = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure,
-                                 TotalNumberOfDatapoints, NumberOfFreeParameters);
+    ChiSquare = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins,
+                                ProteinWeights, &*UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
 
     *ChiXX = ChiSquare;
 

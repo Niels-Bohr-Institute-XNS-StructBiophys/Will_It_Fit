@@ -455,6 +455,11 @@ class MainCls(wx.Frame):
         
         ResolutionPathBoxSizer = wx.BoxSizer(wx.HORIZONTAL)
         ResolutionPathBoxSizer.AddSpacer(10)
+
+        ClearResolutionBtn = wx.Button(self.LeftPanel, label= 'Clear')
+        self.Bind(wx.EVT_BUTTON, self.ClearResolutionFnc, ClearResolutionBtn)
+        ResolutionPathBoxSizer.Add(ClearResolutionBtn)
+        ResolutionPathBoxSizer.AddSpacer(10)
         
         self.ResolutionPathTxt = wx.StaticText(self.LeftPanel, -1, 'N/A')
         ResolutionPathBoxSizer.Add(self.ResolutionPathTxt)
@@ -490,6 +495,11 @@ class MainCls(wx.Frame):
         
         PDBPathSizer = wx.BoxSizer(wx.HORIZONTAL)
         PDBPathSizer.AddSpacer(10)
+
+        ClearPDBBtn = wx.Button(self.LeftPanel, label= 'Clear')
+        self.Bind(wx.EVT_BUTTON, self.ClearPDBFnc, ClearPDBBtn)
+        PDBPathSizer.Add(ClearPDBBtn)
+        PDBPathSizer.AddSpacer(10)
         
         self.PDBPathTxt = wx.StaticText(self.LeftPanel, -1, 'N/A')
         PDBPathSizer.Add(self.PDBPathTxt)
@@ -512,6 +522,48 @@ class MainCls(wx.Frame):
         PDBLine = wx.StaticLine(self.LeftPanel)
         LeftBoxSizer.Add(PDBLine, wx.EXPAND|wx.HORIZONTAL)
         
+        # Widgets used to input .ens-file if needed
+        LeftBoxSizer.AddSpacer(10)
+        
+        ENSTextBoxSizer = wx.BoxSizer(wx.HORIZONTAL)
+        ENSTextBoxSizer.AddSpacer(10)
+        
+        ENSText = wx.StaticText(self.LeftPanel, -1, 'Location of .ens-file:')
+        ENSTextBoxSizer.Add(ENSText)
+        
+        LeftBoxSizer.Add(ENSTextBoxSizer, 0, wx.EXPAND|wx.HORIZONTAL)
+        LeftBoxSizer.AddSpacer(10)
+        
+        ENSPathSizer = wx.BoxSizer(wx.HORIZONTAL)
+        ENSPathSizer.AddSpacer(10)
+        
+        ClearENSBtn = wx.Button(self.LeftPanel, label= 'Clear')
+        self.Bind(wx.EVT_BUTTON, self.ClearENSFnc, ClearENSBtn)
+        ENSPathSizer.Add(ClearENSBtn)
+        ENSPathSizer.AddSpacer(10)
+
+        self.ENSPathTxt = wx.StaticText(self.LeftPanel, -1, 'N/A')
+        ENSPathSizer.Add(self.ENSPathTxt)
+        
+
+        LeftBoxSizer.Add(ENSPathSizer, 0, wx.EXPAND|wx.HORIZONTAL)
+        LeftBoxSizer.AddSpacer(10)
+        
+        ENSBtnSizer = wx.BoxSizer(wx.HORIZONTAL)
+        ENSBtnSizer.AddSpacer(10)
+        
+        BrowseENSBtn = wx.Button(self.LeftPanel, label = 'Browse')
+        self.Bind(wx.EVT_BUTTON, self.BrowseENSFnc, BrowseENSBtn)
+        self.ENSPathStr = 'N/A'
+        ENSBtnSizer.Add(BrowseENSBtn, 1, wx.EXPAND)
+        ENSBtnSizer.AddSpacer(10)
+        
+        LeftBoxSizer.Add(ENSBtnSizer, 0, wx.EXPAND|wx.HORIZONTAL)
+        LeftBoxSizer.AddSpacer(10)
+        
+        ENSLine = wx.StaticLine(self.LeftPanel)
+        LeftBoxSizer.Add(ENSLine, wx.EXPAND|wx.HORIZONTAL)
+
         # Widgets used on the right side of the panel
         self.RightBoxSizer.AddSpacer(10)
         
@@ -622,6 +674,7 @@ class MainCls(wx.Frame):
         DataStr = self.DataPathStr
         SamplesStr = self.SamplesPathStr
         PDBStr = self.PDBPathStr
+        ENSStr = self.ENSPathStr
         
         if self.RBComputeModel.GetValue():
             FittingRoutine = 0
@@ -791,6 +844,7 @@ class MainCls(wx.Frame):
         ProcessToCall.append('-e=%s' % ResolutionFileName)
         ProcessToCall.append('-o=%d' % PrintCorrelationInt)
         ProcessToCall.append('-d=%s' % PDBStr)
+        ProcessToCall.append('-b=%s' % ENSStr)
         ProcessToCall.append('-h=%s' % ChiSquareFractile)
         ProcessToCall.append('-a=%d' % FittingRoutineArgument3)
         ProcessToCall.append('-z=%d' % 0)
@@ -1090,6 +1144,12 @@ class MainCls(wx.Frame):
             self.PlotBtn.Disable()
         
         FileDialogWindow.Destroy()
+
+## Define function for clearing chosen resolution file
+    def ClearResolutionFnc(self, event):
+        self.ResolutionPathStr = 'N/A'
+        self.ResolutionPathTxt.SetLabel('N/A')
+
         
 ## Define function for filebrowsing for samples
     def BrowsePDBFnc(self, event):
@@ -1112,6 +1172,38 @@ class MainCls(wx.Frame):
             self.PlotBtn.Disable()
         
         FileDialogWindow.Destroy()
+
+## Define function for clearing chosen .pdb file
+    def ClearPDBFnc(self, event):
+        self.PDBPathStr = 'N/A'
+        self.PDBPathTxt.SetLabel('N/A')
+
+## Define function for filebrowsing for ensamples
+    def BrowseENSFnc(self, event):
+        FileDialogWindow = wx.FileDialog(None, 'Please select .ens-file...', os.getcwd(), defaultFile = '', \
+                                         wildcard = 'ENS-files (.ens) |*.ens|' 'All files |*.', style = wx.FD_OPEN)
+        
+        if FileDialogWindow.ShowModal() == wx.ID_OK:
+            self.ENSPathStr = FileDialogWindow.GetPath()
+            ENSPathDisplayStr = str(self.ENSPathStr)
+            
+            while len(ENSPathDisplayStr) > 40:
+                ENSPathDisplayStr = ENSPathDisplayStr[1:]
+            
+            if len(self.ENSPathStr) > 40:
+                ENSPathDisplayStr = '...' + ENSPathDisplayStr
+            
+            self.ENSPathTxt.SetLabel(ENSPathDisplayStr)
+            
+            self.UndoBtn.Disable()
+            self.PlotBtn.Disable()
+        
+        FileDialogWindow.Destroy()
+
+## Define function for clearing chosen .ens file
+    def ClearENSFnc(self, event):
+        self.ENSPathStr = 'N/A'
+        self.ENSPathTxt.SetLabel('N/A')
         
 ## Compilersetup
     def SetupCompiler(self):

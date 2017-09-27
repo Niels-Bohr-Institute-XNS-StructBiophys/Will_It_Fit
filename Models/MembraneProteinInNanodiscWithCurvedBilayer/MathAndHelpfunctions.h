@@ -193,7 +193,7 @@ void AddScatteringFromResidue(double complex **beta, double Q, struct Residue re
     //Variables used for calculating Plm functions
     int LegendreSize =  gsl_sf_legendre_array_n(Nh);
     int LegendreIndex;
-    const int LegendreMode = 0;
+    const int LegendreMode = 3;
     double Legendre[LegendreSize];
 
     double bessel[Nh+1];

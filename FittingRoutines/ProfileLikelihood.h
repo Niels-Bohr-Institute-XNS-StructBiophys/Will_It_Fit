@@ -1,7 +1,7 @@
 int ProfileLikelihood(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Parameters, int NumberOfParameters, int MaxIterations, double *ChiXX, int NumberOfSmearingFolds,
-                      double * VolumesOfMolecules, struct Protein ProteinStructure, struct UserDefined * UserDefinedStructure, double DeltaForDifferentiations, double ChiSquareFractile,
-                      int NumberOfCycles, char CardFileLocation[256], int NumberOfSampleInformations, int TotalNumberOfDatapoints, int NumberOfFreeParameters,
-                      int HighestNumberOfDatapoints)
+                    double * VolumesOfMolecules, struct Protein * Ensemble, int NumberOfProteins, double * ProteinWeights, struct UserDefined * UserDefinedStructure,
+                    double DeltaForDifferentiations, double ChiSquareFractile, int NumberOfCycles, char CardFileLocation[256], int NumberOfSampleInformations,
+                    int TotalNumberOfDatapoints, int NumberOfFreeParameters, int HighestNumberOfDatapoints)
 {
     // Variables used in iterations
     int i;
@@ -49,8 +49,8 @@ int ProfileLikelihood(struct Dataset * Data, int NumberOfSpectra, struct Paramet
     // Initial chisquare computation
     printf("Initializing Profile Likelihood-computation... \n");
 
-    ChiXXInitial = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure,
-                                    TotalNumberOfDatapoints, NumberOfFreeParameters);
+    ChiXXInitial = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins,
+                                ProteinWeights, &*UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
 
     printf("Initial chisquare is %g...\n", ChiXXInitial);
     printf("Likelihood boundary is set to %g...\n", ChiXXInitial + ChiSquareFractile);
@@ -109,8 +109,8 @@ int ProfileLikelihood(struct Dataset * Data, int NumberOfSpectra, struct Paramet
         DummyParameters[ParametersToSearch[i]].Value += ArbitraryStepSize;
 
         LevenbergMarquardt(Data, NumberOfSpectra, DummyParameters, NumberOfParameters, MaxIterations, &ChiXXDummy, NumberOfSmearingFolds, VolumesOfMolecules, true, false,
-                           ProteinStructure, &*UserDefinedStructure, DeltaForDifferentiations, NumberOfSampleInformations, TotalNumberOfDatapoints, NumberOfFreeParameters,
-                           HighestNumberOfDatapoints);
+                           Ensemble, NumberOfProteins, ProteinWeights, &*UserDefinedStructure, DeltaForDifferentiations, NumberOfSampleInformations, TotalNumberOfDatapoints,
+                           NumberOfFreeParameters, HighestNumberOfDatapoints);
 
         ArbitraryChiSquare = ChiXXDummy;
         dParameter = sqrt(ChiSquareFractile) * ArbitraryStepSize / (NumberOfSteps * sqrt(fabs(ArbitraryChiSquare - ChiXXInitial)));
@@ -148,8 +148,8 @@ int ProfileLikelihood(struct Dataset * Data, int NumberOfSpectra, struct Paramet
 
             // Search
             LevenbergMarquardt(Data, NumberOfSpectra, DummyParameters, NumberOfParameters, MaxIterations, &ChiXXDummy, NumberOfSmearingFolds, VolumesOfMolecules, true, false,
-                               ProteinStructure, &*UserDefinedStructure, DeltaForDifferentiations, NumberOfSampleInformations, TotalNumberOfDatapoints, NumberOfFreeParameters,
-                               HighestNumberOfDatapoints);
+                            Ensemble, NumberOfProteins, ProteinWeights, &*UserDefinedStructure, DeltaForDifferentiations, NumberOfSampleInformations, TotalNumberOfDatapoints,
+                            NumberOfFreeParameters, HighestNumberOfDatapoints);
 
             fprintf(fp, "%10g %10g \n", DummyParameters[ParametersToSearch[i]].Value, ChiXXDummy);
 
@@ -198,8 +198,8 @@ int ProfileLikelihood(struct Dataset * Data, int NumberOfSpectra, struct Paramet
         DummyParameters[ParametersToSearch[i]].Value -= ArbitraryStepSize;
 
         LevenbergMarquardt(Data, NumberOfSpectra, DummyParameters, NumberOfParameters, MaxIterations, &ChiXXDummy, NumberOfSmearingFolds, VolumesOfMolecules, true, false,
-                           ProteinStructure, &*UserDefinedStructure, DeltaForDifferentiations, NumberOfSampleInformations, TotalNumberOfDatapoints, NumberOfFreeParameters,
-                           HighestNumberOfDatapoints);
+                           Ensemble, NumberOfProteins, ProteinWeights, &*UserDefinedStructure, DeltaForDifferentiations, NumberOfSampleInformations, TotalNumberOfDatapoints,
+                           NumberOfFreeParameters, HighestNumberOfDatapoints);
 
         ArbitraryChiSquare = ChiXXDummy;
         dParameter = sqrt(ChiSquareFractile) * ArbitraryStepSize / (NumberOfSteps * sqrt(fabs(ArbitraryChiSquare - ChiXXInitial)));
@@ -237,8 +237,8 @@ int ProfileLikelihood(struct Dataset * Data, int NumberOfSpectra, struct Paramet
 
             // Search
             LevenbergMarquardt(Data, NumberOfSpectra, DummyParameters, NumberOfParameters, MaxIterations, &ChiXXDummy, NumberOfSmearingFolds, VolumesOfMolecules, true, false,
-                               ProteinStructure, &*UserDefinedStructure, DeltaForDifferentiations, NumberOfSampleInformations, TotalNumberOfDatapoints, NumberOfFreeParameters,
-                               HighestNumberOfDatapoints);
+                            Ensemble, NumberOfProteins, ProteinWeights, &*UserDefinedStructure, DeltaForDifferentiations, NumberOfSampleInformations, TotalNumberOfDatapoints,
+                            NumberOfFreeParameters, HighestNumberOfDatapoints);
 
             fprintf(fp, "%10g %10g \n", DummyParameters[ParametersToSearch[i]].Value, ChiXXDummy);
 
@@ -299,8 +299,8 @@ int ProfileLikelihood(struct Dataset * Data, int NumberOfSpectra, struct Paramet
     fclose(fp);
 
     // Generate original fits
-    ChiXXInitial = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure,
-                                    TotalNumberOfDatapoints, NumberOfFreeParameters);
+    ChiXXInitial = ComputeChiSquare(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins,
+                                ProteinWeights, &*UserDefinedStructure, TotalNumberOfDatapoints, NumberOfFreeParameters);
 
     // Conclusion
     *ChiXX = ChiXXInitial;

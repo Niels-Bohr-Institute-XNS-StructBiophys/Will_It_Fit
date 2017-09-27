@@ -8,7 +8,6 @@ double ComputeValue(double q, int DatapointID, int DatasetID, struct Dataset * D
     double Intensity;
     double Stepsize;
     double SigmaOfQ;
-
     // Computation
     for (i = 0; i < NumberOfParameters; ++i) {
         DummyParameters[i] = Parameters[i].Value;
@@ -98,9 +97,9 @@ void ComputeTheGradient(double q, int DatapointID, int DatasetID, double Intensi
 }
 
 void ComputeValueAndCovarianceMatrix(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Parameters, int NumberOfParameters, int NumberOfSmearingFolds,
-                                     double * VolumesOfMolecules, struct Protein ProteinStructure, struct UserDefined * UserDefinedStructure, double ** AlphaMatrix,
-                                     double * Beta, double *ChisquareFinal, double DeltaForDifferentiations, int NumberOfSampleInformations, int TotalNumberOfDatapoints,
-                                     int NumberOfFreeParameters, int HighestNumberOfDatapoints)
+                                    double * VolumesOfMolecules, struct Protein * Ensemble, int NumberOfProteins, double * ProteinWeights, struct UserDefined * UserDefinedStructure,
+                                    double ** AlphaMatrix, double * Beta, double *ChisquareFinal, double DeltaForDifferentiations, int NumberOfSampleInformations,
+                                    int TotalNumberOfDatapoints, int NumberOfFreeParameters, int HighestNumberOfDatapoints)
 {
 	// Declarations
 	int i;
@@ -116,6 +115,7 @@ void ComputeValueAndCovarianceMatrix(struct Dataset * Data, int NumberOfSpectra,
 	struct Parameter * DummyParameters;
     struct Dataset * DummyData;
     struct UserDefined UserDefinedCopy;
+    struct Protein ProteinStructure = Ensemble[0];
     struct Protein ProteinStructureCopy;
 
     // Initialisation
@@ -402,9 +402,9 @@ int GaussJordanElimination(double ** Matrix, int SizeOfMatrix, double * Vector)
 }
 
 void RunLevenbergMarquardt(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Parameters, int NumberOfParameters, int NumberOfSmearingFolds, double * VolumesOfMolecules,
-                           struct Protein ProteinStructure, struct UserDefined * UserDefinedStructure,  double DeltaForDifferentiations, double ** CovarianceMatrix,
-                           double ** AlphaMatrix, double * Lambda, double *Chisquare, double * Beta, int NumberOfSampleInformations, int TotalNumberOfDatapoints,
-                           int NumberOfFreeParameters, int HighestNumberOfDatapoints)
+                            struct Protein * Ensemble, int NumberOfProteins,double * ProteinWeights, struct UserDefined * UserDefinedStructure,  double DeltaForDifferentiations,
+                            double ** CovarianceMatrix, double ** AlphaMatrix, double * Lambda, double *Chisquare, double * Beta, int NumberOfSampleInformations, int TotalNumberOfDatapoints,
+                            int NumberOfFreeParameters, int HighestNumberOfDatapoints)
 {
     // Declarations
     int i;
@@ -428,9 +428,9 @@ void RunLevenbergMarquardt(struct Dataset * Data, int NumberOfSpectra, struct Pa
 	if (*Lambda < 0.0) {
 		*Lambda = 0.001;
 
-		ComputeValueAndCovarianceMatrix(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure,
-                                        AlphaMatrix, Beta, &*Chisquare, DeltaForDifferentiations, NumberOfSampleInformations, TotalNumberOfDatapoints, NumberOfFreeParameters,
-                                        HighestNumberOfDatapoints);
+		ComputeValueAndCovarianceMatrix(Data, NumberOfSpectra, Parameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins,
+                                        ProteinWeights, &*UserDefinedStructure, AlphaMatrix, Beta, &*Chisquare, DeltaForDifferentiations, NumberOfSampleInformations,
+                                        TotalNumberOfDatapoints, NumberOfFreeParameters, HighestNumberOfDatapoints);
 
 		PreviousChisquare = *Chisquare;
 	}
@@ -494,9 +494,9 @@ void RunLevenbergMarquardt(struct Dataset * Data, int NumberOfSpectra, struct Pa
         }
     }
 
-    ComputeValueAndCovarianceMatrix(Data, NumberOfSpectra, DummyParameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure,
-                                    CovarianceMatrix, ParameterSteps, &*Chisquare, DeltaForDifferentiations, NumberOfSampleInformations, TotalNumberOfDatapoints, NumberOfFreeParameters,
-                                    HighestNumberOfDatapoints);
+    ComputeValueAndCovarianceMatrix(Data, NumberOfSpectra, DummyParameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, Ensemble, NumberOfProteins,ProteinWeights,
+                                    &*UserDefinedStructure, CovarianceMatrix, ParameterSteps, &*Chisquare, DeltaForDifferentiations, NumberOfSampleInformations, TotalNumberOfDatapoints,
+                                    NumberOfFreeParameters, HighestNumberOfDatapoints);
 
 	if (*Chisquare < PreviousChisquare) {
 		*Lambda *= 0.1;

@@ -78,7 +78,7 @@ void AssignFittingRanges(struct Dataset * Data, double QMin, double QMax, int Nu
 void AssignArguments(int NumberOfArguments, char *Arguments[], char CardFileLocation[256], char SamplesFileLocation[256], char ParameterFileLocation[256],
                      double *QMin, double *QMax, int *ChooseFittingRoutine, int *FittingRoutineArgument2,
                      bool *IncludeResolutionEffects, int *NumberOfSmearingFolds, char ResolutionFileLocation[256], bool *PrintCorrelationMatrix,
-                     char PDBFileLocation[256], double *ChiSquareFractile, int *FittingRoutineArgument3, bool * CMD)
+                     char PDBFileLocation[256], char ENSFileLocation[256], double *ChiSquareFractile, int *FittingRoutineArgument3, bool * CMD)
 {
     // Declarations
     int i;
@@ -163,6 +163,10 @@ void AssignArguments(int NumberOfArguments, char *Arguments[], char CardFileLoca
 
             case 'z':
                 *CMD = atoi(Argument);
+            break;
+
+            case 'b':
+                sprintf(ENSFileLocation, "%s", Argument);
             break;
             // Unknown argument
             default:
