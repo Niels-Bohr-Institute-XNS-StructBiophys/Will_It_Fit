@@ -1,1 +1,1 @@
-#include "/home/asger/BioGit/Will_It_Fit/Models/Protein/ModelInfo.h"
+#include "/Users/nicholas/Documents/ERDA_NSG/Seafile/LINX/Projects/FP04.01_Novo/DataAnalysis/fattyacids/ScatteringCalculations/WIFBashForNN/Will_It_Fit/Models/Protein/ModelInfo.h"
