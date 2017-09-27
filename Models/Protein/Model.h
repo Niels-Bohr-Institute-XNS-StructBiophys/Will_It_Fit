@@ -20,25 +20,20 @@ double Model(double q, double * Parameters, double * Constraints, double Contras
 
 
 	//Loop over residues
-      for(j = 0; j < ProteinStructure.NumberOfResidues; j++){ // for AA based calculation
-	
-	     
-    	      CopyResidue(&ProteinStructure.Residues[j], &CurrentResidue); // For AA based calculation
-	      
-// 	      if (q ==0.5 ){ //Print statement for housekeeping
-//                            printf("current residue: %s Volume %0.2e %f,%f,%f\n",CurrentResidue.Name, CurrentResidue.Volume, CurrentResidue.xVolume, CurrentResidue.yVolume,CurrentResidue.zVolume);
-//			   }
-             
-	      if (strcmp(CurrentResidue.Name, "WAT") == 0 ) {
-                 				CurrentResidue.Volume = CurrentResidue.Volume*(1./(1.+Parameters[HYDR]));
-	      }
-
-              if (strcmp(CurrentResidue.Name,  "  X") == 0 ) {
-    	    					CurrentResidue.Volume = CurrentResidue.Volume*(1./(1.+Parameters[GLYCV]));
-          					}
-	     AddScatteringFromResidue(Beta, q, CurrentResidue, Contrast, ScatteringLengthDensityOfWater, 1.0); // Parameters[PROTSCALE]);
-	     //AddScatteringFromSolvent(BetaSolvent, q, CurrentResidue, Contrast, ScatteringLengthDensityOfWater, 1.0); // Parameters[PROTSCALE]);
-}
+    for(j = 0; j < ProteinStructure.NumberOfResidues; j++){ // for AA based calculation 
+        CopyResidue(&ProteinStructure.Residues[j], &CurrentResidue); // For AA based calculation	      
+        /*if (q ==0.5 ){ //Print statement for housekeeping
+            printf("current residue: %s Volume %0.2e %f,%f,%f\n",CurrentResidue.Name, CurrentResidue.Volume, CurrentResidue.xVolume, CurrentResidue.yVolume,CurrentResidue.zVolume);
+		}*/           
+        if (strcmp(CurrentResidue.Name, "WAT") == 0 ) {
+			CurrentResidue.Volume = CurrentResidue.Volume*(1./(1.+Parameters[HYDR]));
+        }
+        if (strcmp(CurrentResidue.Name,  "  X") == 0 ) {
+			CurrentResidue.Volume = CurrentResidue.Volume*(1./(1.+Parameters[GLYCV]));
+		}
+        AddScatteringFromResidue(Beta, q, CurrentResidue, Contrast, ScatteringLengthDensityOfWater, 1.0); // Parameters[PROTSCALE]);
+        //AddScatteringFromSolvent(BetaSolvent, q, CurrentResidue, Contrast, ScatteringLengthDensityOfWater, 1.0); // Parameters[PROTSCALE]);
+    }
 
 
     // Calculate intensity
@@ -48,15 +43,11 @@ double Model(double q, double * Parameters, double * Constraints, double Contras
     I0 = 0.0;
 
     for(l = 0; l < NumberOfHarmonics + 1; l++) {
-
-      for (m = 0; m <= l; m++) {
-        Intensity += ((m > 0) + 1) * pow(cabs(Beta[l][m]), 2); //Calculate intensity
-        //IntensitySolvent += ((m > 0) + 1) * pow(cabs(BetaSolvent[l][m]), 2); //Calculate intensity
-
-      }
+        for (m = 0; m <= l; m++) {
+            Intensity += ((m > 0) + 1) * pow(cabs(Beta[l][m]), 2); //Calculate intensity
+            //IntensitySolvent += ((m > 0) + 1) * pow(cabs(BetaSolvent[l][m]), 2); //Calculate intensity
+        }
     }
-
-
 
    /// Rescale result and return
     if (Contrast >= 0.0 && Contrast <= 100.0) {

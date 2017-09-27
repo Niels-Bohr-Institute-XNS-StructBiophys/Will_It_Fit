@@ -338,11 +338,8 @@ int main(int argc, char *argv[])
     /// Output data and parameters
     printf("\n");
     ClearScreen();
-    //Create directory for output
-    //This might be platform specific
-    sprintf(ResultsDirectory, "%s-results", CardFileLocation);
-    //mkdir(ResultsDirectory, 0700);
 
+    sprintf(ResultsDirectory, "%s-results", CardFileLocation);
     OutputData(ChiSquare, QMin, QMax, Parameters, NumberOfParameters, Data, NumberOfSpectra, CardFileLocation, ProteinStructure, UserDefinedStructure, SamplesFileLocation, ResultsDirectory);
     OutputSpectra(Data, NumberOfSpectra, ResultsDirectory);
     OutputParameters(Parameters, NumberOfParameters, ChooseFittingRoutine, ChiSquare, ResultsDirectory);

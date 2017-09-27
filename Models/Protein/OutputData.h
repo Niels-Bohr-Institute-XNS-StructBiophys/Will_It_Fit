@@ -10,20 +10,28 @@ void OutputData(double ChiSquare, double QMin, double QMax, struct Parameter * P
     FILE *fp;
     //const char *filename;
     char Filename[256];
+    struct stat status = { 0 };
     sprintf(Filename, "%s/Results.wif", ResultsDirectory);
     //filename = "Results.wif";
 
     /// I/O
     // Create the output file
+    printf("%s\n", Filename);
     fp = fopen(Filename, "w+");
-
+    //Check if results directory exists, and create it if not
+    //Create directory for output
+    //This might be platform specific
+    if(stat (ResultsDirectory, &status) ==-1){
+        mkdir(ResultsDirectory, 0700);
+        fp = fopen(Filename, "w+");
+    }
     // Print filfilenames to file
+    
     fprintf(fp, ".card-file: \n");
     fprintf(fp, "%s \n", cardfilename);
 
     fprintf(fp, "\n");
     fprintf(fp, "Datafiles: \n");
-
     for(i = 0; i < NumberOfSpectra; ++i){
         fprintf(fp, "%s \n", Data[i].Filename);
     }
@@ -31,7 +39,6 @@ void OutputData(double ChiSquare, double QMin, double QMax, struct Parameter * P
     fprintf(fp, "\n");
 
     // Print location of sample file
-    fprintf(fp, "Sample info-file: \n");
     fprintf(fp, "%s \n", SampleFilename);
 
     fprintf(fp, "\n");
@@ -50,7 +57,6 @@ void OutputData(double ChiSquare, double QMin, double QMax, struct Parameter * P
     // Print parameters and properties of parameters to file
     fprintf(fp, "Parameters: \n");
     fprintf(fp, "Name:             Value:            Error: \n");
-
     for(i = 0; i < NumberOfParameters; ++i){
         if (Parameters[i].iParameter == true) {
             fprintf(fp, "%-25s   %-15f   %-15g \n", Parameters[i].Name, Parameters[i].Value, Parameters[i].Error);
@@ -69,8 +75,8 @@ void OutputData(double ChiSquare, double QMin, double QMax, struct Parameter * P
     }
     // Calculate Molecular Weigth
     double Weight = 0.0;
-   double WeightModification = 0.0;
-  double VolumeModification = 0.0; 
+    double WeightModification = 0.0;
+    double VolumeModification = 0.0; 
     for (i = 0; i < ProteinStructure.NumberOfResidues; ++i){
 	    if(strcmp(ProteinStructure.Residues[i].Name, "W") != 0 || strcmp(ProteinStructure.Residues[i].Name, "HOH") != 0 ){ // Skip waters in calculation of molecular weight
 	   
