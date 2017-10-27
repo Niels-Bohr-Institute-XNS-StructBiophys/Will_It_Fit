@@ -20,7 +20,6 @@ double Model(double q, double * Parameters, double * Constraints, double Contras
 
 
 	//Loop over residues
-<<<<<<< HEAD
     for(j = 0; j < ProteinStructure.NumberOfResidues; j++){ // for AA based calculation 
         CopyResidue(&ProteinStructure.Residues[j], &CurrentResidue); // For AA based calculation	      
         /*if (q ==0.5 ){ //Print statement for housekeeping
@@ -28,6 +27,9 @@ double Model(double q, double * Parameters, double * Constraints, double Contras
 		}*/           
         if (strcmp(CurrentResidue.Name, "WAT") == 0 ) {
 			CurrentResidue.Volume = CurrentResidue.Volume*(1./(1.+Parameters[HYDR]));
+            if (Contrast >= 0.0 && Contrast <= 100.0) {
+                CurrentResidue.NeutronScatteringLength = 4.133 *(2*((Contrast* 6.671e-13 / 100.) +  ((100.-Contrast)* -3.741e-13 / 100.)) + 5.803); 
+            }
         }
         if (strcmp(CurrentResidue.Name,  "  X") == 0 ) {
 			CurrentResidue.Volume = CurrentResidue.Volume*(1./(1.+Parameters[GLYCV]));
@@ -35,32 +37,6 @@ double Model(double q, double * Parameters, double * Constraints, double Contras
         AddScatteringFromResidue(Beta, q, CurrentResidue, Contrast, ScatteringLengthDensityOfWater, 1.0); // Parameters[PROTSCALE]);
         //AddScatteringFromSolvent(BetaSolvent, q, CurrentResidue, Contrast, ScatteringLengthDensityOfWater, 1.0); // Parameters[PROTSCALE]);
     }
-=======
-      for(j = 0; j < ProteinStructure.NumberOfResidues; j++){ // for AA based calculation
-	
-	     
-    	      CopyResidue(&ProteinStructure.Residues[j], &CurrentResidue); // For AA based calculation
-	      
-// 	      if (q ==0.5 ){ //Print statement for housekeeping
-//                            printf("current residue: %s Volume %0.2e %f,%f,%f\n",CurrentResidue.Name, CurrentResidue.Volume, CurrentResidue.xVolume, CurrentResidue.yVolume,CurrentResidue.zVolume);
-//			   }
-             
-	      if (strcmp(CurrentResidue.Name, "WAT") == 0 ) {
-                 				CurrentResidue.Volume = CurrentResidue.Volume*(1./(1.+Parameters[HYDR]));
-						if (Contrast >= 0.0 && Contrast <= 100.0) {
-						
-						CurrentResidue.NeutronScatteringLength = 4.133 *(2*((Contrast* 6.671e-13 / 100.) +  ((100.-Contrast)* -3.741e-13 / 100.)) + 5.803); 
-						}
-	      }
-
-              if (strcmp(CurrentResidue.Name,  "  X") == 0 ) {
-    	    					CurrentResidue.Volume = CurrentResidue.Volume*(1./(1.+Parameters[GLYCV]));
-          					}
-	     AddScatteringFromResidue(Beta, q, CurrentResidue, Contrast, ScatteringLengthDensityOfWater, 1.0); // Parameters[PROTSCALE]);
-	     //AddScatteringFromSolvent(BetaSolvent, q, CurrentResidue, Contrast, ScatteringLengthDensityOfWater, 1.0); // Parameters[PROTSCALE]);
-}
->>>>>>> afd31bcf68329473c55e1b36c29e658c1738d116
-
 
     // Calculate intensity
     Intensity = 0.0;

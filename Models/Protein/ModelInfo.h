@@ -14,8 +14,8 @@
 #include <unistd.h>
 
  //Order of harmonics
- #define NumberOfHarmonics 17
- #include "MathAndHelpfunctions.h"
+#define NumberOfHarmonics 17
+#include "MathAndHelpfunctions.h"
 #include "Constraints.h"
 //#include "SemiflexibleChain.h"
 #include "Model.h"
