@@ -1,0 +1,5 @@
+System's standard GSL
+gcc WillItFit.c -O3 -fopenmp -g -Wall -o WillItFit.com -lm -lgsl -lgslcblas
+
+User-supplied GSL built under $PATHTOGSL/gsl-2.4/build/
+gcc WillItFit.c -O3 -fopenmp -g -Wall -o WillItFit.com -L$PATHTOGSL/gsl-2.4/build/lib/ -lm -lgsl -lgslcblas -Wl,-rpath,"$PATHTOGSL/gsl-2.4/build/lib/"

@@ -1,0 +1,16 @@
+1               Sample information file for protein with modification
+
+The molecular volumes
+29.94           Molecular volume of solvent [Å^3]
+
+The neutron scattering lengths in 100% D2O
+1.9145E-12      Scattering length of solvent [cm]
+
+The neutron scattering lengths in 100% H2O
+-1.678E-13      Scattering length of solvent [cm]
+
+The X-ray scattering lengths
+2.818E-12       Scattering length of solvent [cm]
+
+Name Of Modification
+UZ9

@@ -1,0 +1,173 @@
+.card-file:
+	Data/02_2/R3T3T3R3-crysol.card 
+
+Datafiles:
+	Data/02_2/data/RBSAXS_0p9mM377_100D2O_3p0ZnInsHex_v4_0010_subt.dat 
+	Data/02_2/data/RBQI-SM-42210-pos10-s5-KWS2-He3-10p.DAT 
+	Data/02_2/data/RBQI-SM-42225-pos10-s5-KWS2-He3-10p.DAT 
+	Data/02_2/data/RBQI-SM-42206-pos2-s1-KWS2-He3-10p.DAT 
+	Data/02_2/data/RBQI-SM-42221-pos2-s1-KWS2-He3-10p.DAT 
+
+Sample info-file:
+	Data/02_2/Protein.dat 
+
+Final chisq = 362.822 
+
+Lower limit on q = 0 
+Upper limit on q = 1 
+
+Parameters:
+
+	     Value             Error             Name
+	 0   -0.067217         Fixed             BackN100
+	 1   1                 Fixed             ScaleN100
+	 2   -1.01086          Fixed             BackN0
+	 3   1                 Fixed             ScaleN0
+	 4   -0.0296779        0.00606009        BackX
+	 5   48.5089           2.91686           ScaleX
+	 6   0.811538          0.0188754         ScaleConc
+	 7   0.282973          0.0731773         HYDR
+	 8   0.267852          0.242349          MOD
+
+
+Atom and residue counts:
+
+	Number of Atoms                    : 10201
+	Number of Atoms (Modification UZ9) : 969
+	Number of Residues                 : 10201
+
+	Number of H  : 4799
+	Number of D  : 0
+	Number of C  : 3306
+	Number of N  : 768
+	Number of O  : 912
+	Number of P  : 0
+	Number of S  : 72
+
+	Number of Zn : 4
+	Number of Cl : 4
+	Number of Na : 0
+	Number of Ca : 0
+	Number of Fe : 0
+
+	Number of Q  : 336
+
+
+Molecular weights [u] and displaced volumes [A^3]:
+
+	Molecular weight                             : 97623.076320
+	Molecular weight (only WAT)                  : 25017.214320
+	Molecular weight (only HOH)                  : 0.000000
+	Molecular weight (only WAT + HOH)            : 25017.214320
+	Molecular weight (only UZ9)                  : 5969.376000
+	Molecular weight (without WAT + HOH)         : 72605.862000
+	Molecular weight (without WAT + HOH and UZ9) : 66636.486000
+
+	Volume                                       : 132549.570000
+	Volume (only WAT)                            : 32471.963382
+	Volume (only HOH)                            : 0.000000
+	Volume (only WAT + HOH)                      : 32471.963382
+	Volume (only UZ9)                            : 7242.131059
+	Volume (without WAT + HOH)                   : 100077.606618
+	Volume (without WAT + HOH and UZ9)           : 92835.475559
+
+	Specific volume of UZ9 (cm^3/g)              : 0.730598
+
+
+Radii of gyration (Rg [A]), centers of mass (CoM [A]) and scattering length densities (SLD [1e-6 A^-2]), for X-rays also electron densities (ED [e-/nm^-3]) are given in brackets:
+
+	Spectra no. 0:
+
+		X-ray                Rg                              :   26.77
+		X-ray                Rg  (without WAT + HOH)         :   26.70
+		X-ray                Rg  (without WAT + HOH and UZ9) :   26.40
+		X-ray                Rg  (only WAT + HOH)            :   30.92
+
+		X-ray                SLD                             :  11.169 (ED =  396.33)
+		X-ray                SLD (only WAT)                  :  12.051 (ED =  427.66)
+		X-ray                SLD (only HOH)                  :   0.000 (ED =    0.00)
+		X-ray                SLD (sample solvent)            :   9.412 (ED =  334.00)
+		X-ray                SLD (only UZ9)                  :  12.642 (ED =  448.62)
+		X-ray                SLD (without WAT + HOH)         :  10.882 (ED =  386.17)
+		X-ray                SLD (without WAT + HOH and UZ9) :  10.745 (ED =  381.30)
+
+		X-ray                CoM                             : (-0.000464 0.000026 -0.182375)
+		X-ray                CoM (without WAT + HOH)         : (-0.000467 0.000026 -0.183436)
+		X-ray                CoM (without WAT + HOH and UZ9) : (-0.000499 0.000029 -0.157435)
+
+	Spectra no. 1:
+
+		Neutron ( 42.0% D2O) Rg                              :   28.76
+		Neutron ( 42.0% D2O) Rg  (without WAT + HOH)         :   28.80
+		Neutron ( 42.0% D2O) Rg  (without WAT + HOH and UZ9) :   24.82
+		Neutron ( 42.0% D2O) Rg  (only WAT + HOH)            :   30.92
+
+		Neutron ( 42.0% D2O) SLD                             :   2.005
+		Neutron ( 42.0% D2O) SLD (only WAT)                  :   3.022
+		Neutron ( 42.0% D2O) SLD (only HOH)                  :   0.000
+		Neutron ( 42.0% D2O) SLD (sample solvent)            :   2.361
+		Neutron ( 42.0% D2O) SLD (only UZ9)                  :   1.225
+		Neutron ( 42.0% D2O) SLD (without WAT + HOH)         :   1.676
+		Neutron ( 42.0% D2O) SLD (without WAT + HOH and UZ9) :   1.711
+
+		Neutron ( 42.0% D2O) CoM                             : (0.002223 -0.000121 1.136111)
+		Neutron ( 42.0% D2O) CoM (without WAT + HOH)         : (0.002169 -0.000118 1.109119)
+		Neutron ( 42.0% D2O) CoM (without WAT + HOH and UZ9) : (0.004389 -0.000261 0.701182)
+
+	Spectra no. 2:
+
+		Neutron ( 42.0% D2O) Rg                              :   28.76
+		Neutron ( 42.0% D2O) Rg  (without WAT + HOH)         :   28.80
+		Neutron ( 42.0% D2O) Rg  (without WAT + HOH and UZ9) :   24.82
+		Neutron ( 42.0% D2O) Rg  (only WAT + HOH)            :   30.92
+
+		Neutron ( 42.0% D2O) SLD                             :   2.005
+		Neutron ( 42.0% D2O) SLD (only WAT)                  :   3.022
+		Neutron ( 42.0% D2O) SLD (only HOH)                  :   0.000
+		Neutron ( 42.0% D2O) SLD (sample solvent)            :   2.361
+		Neutron ( 42.0% D2O) SLD (only UZ9)                  :   1.225
+		Neutron ( 42.0% D2O) SLD (without WAT + HOH)         :   1.676
+		Neutron ( 42.0% D2O) SLD (without WAT + HOH and UZ9) :   1.711
+
+		Neutron ( 42.0% D2O) CoM                             : (0.002223 -0.000121 1.136111)
+		Neutron ( 42.0% D2O) CoM (without WAT + HOH)         : (0.002169 -0.000118 1.109119)
+		Neutron ( 42.0% D2O) CoM (without WAT + HOH and UZ9) : (0.004389 -0.000261 0.701182)
+
+	Spectra no. 3:
+
+		Neutron (100.0% D2O) Rg                              :   27.30
+		Neutron (100.0% D2O) Rg  (without WAT + HOH)         :   27.35
+		Neutron (100.0% D2O) Rg  (without WAT + HOH and UZ9) :   25.95
+		Neutron (100.0% D2O) Rg  (only WAT + HOH)            :   30.92
+
+		Neutron (100.0% D2O) SLD                             :   3.271
+		Neutron (100.0% D2O) SLD (only WAT)                  :   8.188
+		Neutron (100.0% D2O) SLD (only HOH)                  :   0.000
+		Neutron (100.0% D2O) SLD (sample solvent)            :   6.394
+		Neutron (100.0% D2O) SLD (only UZ9)                  :   1.225
+		Neutron (100.0% D2O) SLD (without WAT + HOH)         :   1.676
+		Neutron (100.0% D2O) SLD (without WAT + HOH and UZ9) :   1.711
+
+		Neutron (100.0% D2O) CoM                             : (0.000462 -0.000025 0.235658)
+		Neutron (100.0% D2O) CoM (without WAT + HOH)         : (0.000454 -0.000025 0.231429)
+		Neutron (100.0% D2O) CoM (without WAT + HOH and UZ9) : (0.000743 -0.000045 0.060748)
+
+	Spectra no. 4:
+
+		Neutron (100.0% D2O) Rg                              :   27.30
+		Neutron (100.0% D2O) Rg  (without WAT + HOH)         :   27.35
+		Neutron (100.0% D2O) Rg  (without WAT + HOH and UZ9) :   25.95
+		Neutron (100.0% D2O) Rg  (only WAT + HOH)            :   30.92
+
+		Neutron (100.0% D2O) SLD                             :   3.271
+		Neutron (100.0% D2O) SLD (only WAT)                  :   8.188
+		Neutron (100.0% D2O) SLD (only HOH)                  :   0.000
+		Neutron (100.0% D2O) SLD (sample solvent)            :   6.394
+		Neutron (100.0% D2O) SLD (only UZ9)                  :   1.225
+		Neutron (100.0% D2O) SLD (without WAT + HOH)         :   1.676
+		Neutron (100.0% D2O) SLD (without WAT + HOH and UZ9) :   1.711
+
+		Neutron (100.0% D2O) CoM                             : (0.000462 -0.000025 0.235658)
+		Neutron (100.0% D2O) CoM (without WAT + HOH)         : (0.000454 -0.000025 0.231429)
+		Neutron (100.0% D2O) CoM (without WAT + HOH and UZ9) : (0.000743 -0.000045 0.060748)
+

@@ -1,0 +1,32 @@
+5                       // Number of datasets
+
+data/RBSAXS_0p9mM377_100D2O_3p0ZnInsHex_v4_0010_subt.dat      // Name of first dataset
+-1.0                    // Contrast of first dataset (in this case SAXS)
+0.075                   // Concentration of sample in mmol/L (mM) in first dataset (0.9 mM monomeric insulin, but here di-hexameric PDB structure)
+1.0                     // Scaling of first dataset
+0.0                     // Background of first dataset
+
+data/RBQI-SM-42210-pos10-s5-KWS2-He3-10p.DAT
+42
+0.075
+1.0
+0.0
+
+data/RBQI-SM-42225-pos10-s5-KWS2-He3-10p.DAT
+42
+0.075
+1.0
+0.0
+
+data/RBQI-SM-42206-pos2-s1-KWS2-He3-10p.DAT
+100
+0.075
+1.0
+0.0
+
+data/RBQI-SM-42221-pos2-s1-KWS2-He3-10p.DAT
+100
+0.075
+1.0
+0.0
+
