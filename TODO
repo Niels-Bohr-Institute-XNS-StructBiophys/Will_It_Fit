@@ -1,0 +1,68 @@
+
+[x] Ylm Rotations and in-memory computation GDP WIF
+Keep Ylm and jl in memory and recycle if possible (angles do not change, r does not change and no smearing)
+
+Fix ProteinStructureCopy issue
+UserDefinedShared.h + included in IncludeUserDefined.h
+Change all interfaces where UserDefined is by adding UserDefinedShared (without copy)
+Test it first
+Flags
+	requires activation via new flag -m also saved in boolean in UserDefinedShared
+	check: activation only possible when using PDB structure (-d)
+	check: activation only possible for LM (or LM type maybe) and ComputeModel algorithm so far
+	check: activation only possible without smearing so far (good for SAXS only)
+	use of precomputed values / UserDefinedShared controlled via flag
+UserDefinedShared should contain 3 sets of Ylms for two rotation angles (w/o rotation + current rotation + gradient-changed) because of gradient in LM, each set includes rotation angles, WignerD matrix elements
+
+
+jlqStruct **jlqStructure
+Rotation angles (def 0.0 0.0 0.0)
+axis (def zxz? zyz?)
+Rij (def unit matrix)
+WignerD (def some kronecker-deltas?)
+Translation (def 0.0 0.0 0.0)
+jlq_j
+	q	j	l	jl(q*r_j) (use maybe other index order)
+
+
+YlmStruct **YlmStructure
+Rotation angles (def 0.0 0.0 0.0)
+axis (def zxz? zyz?)
+Rij (def unit matrix)
+WignerD (def some kronecker-deltas?)
+Translation (def 0.0 0.0 0.0)
+Ylm_j
+	j	l	m	Ylm(theta_j,phi_j) (use maybe other index order)
+
+
+-> RunLevenbergMarquardt(): update in LM + gradient of LM pre-computation
+-> used in Model, UserDefinedShared init, update in LM
+-> another used in Model for gradient of LM? Identify which one of the two by angles? Or by an index in a thread-private UserDefined structure assigned in TheGradient and Other functions
+
+-> YlmStructure is a vector for all subgroups of atoms (whole structure treated the same -> only one group)
+-> ProteinStructure.Atom[k] -> needs to assigned index i for YlmStructure[i] and index j therein
+
+
+
+	Fill UserDefinedShared with precomputed unrotated Ylm and jl for all atoms and q at WillItFit.c level
+	How to handle rotations incl pivotpoint-(back)translations of molecular groups only (MOD) with different Rij?
+		Rotating only part of the PDB and others not alone does not make sense, thus only when involving tranlations
+		Easiest way: flag all special atoms (or just identify by residue name), optionally rotate full structure, update all special atoms after that with translation, rotation, backtranslation and new expansion 
+		To make it also efficient for subgroup rotations incl translations, this would require a Model/ based function translating the subgroups from its model-dep pivotpoint to the origin (0,0,0), precomputing the Ylm there, later these can be used with WignerD approach there too.
+
+Model-Based functions in MathAndHelpfunctions.h:
+	Function identifying subgroups and its atoms, assigning them with right rotation, translation etc
+	Model and AddScatteringFromResidue must be adapted, allowing the use of precomputed values, deciding which rotation needs to be used
+	Each subgroup needs to be treated correctly in Model calculation
+
+AuxillaryFunctions.h could serve for globally used functions which are useful even for other models:
+	Function pre-calculating the jl and Ylm for given q and coordinates -> can be "global", called from UserDefinedShared init, LM (gradient, update), potentially Model
+	Function calculating the Rij rotation matrix for given alpha beta gamma and axis -> can be "global"
+	Function calculating the WignerD matrix for given Rij or alpha beta gamma and axis -> can be "global"
+	Function calculating the rotated Ylms with the WignerD from unrotated -> can be "global"
+	Function calculating the memory consumption used by UserDefinedShared -> can be "global"
+
+In LevenbergMarquardtSupportingFunctions():
+	new Function calculating new parameters for Gradient from current Parameters
+	-> use the same function to pre-compute Gradient relevant structures (2nd ones) in each LM step at RunLevenbergMarquardt() level
+
