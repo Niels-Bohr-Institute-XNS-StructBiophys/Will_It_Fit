@@ -227,11 +227,12 @@ int main(int argc, char *argv[])
 
 	if ( abs(WriteLog) > 0 )
 	{
-		fprintf( logfile, "************************** WillItFit for Novo Nordisk **************************\n\n") ;
-		fprintf( logfile, "Fitting Macromolecules with Modifications\n") ;
-		fprintf( logfile, "Version 0.01 2018-01-23\n") ;
-		fprintf( logfile, "\n\n") ;
-		fprintf( logfile, "Based on WillItFit software (M.C. Pedersen, L. Arleth and K. Mortensen, \"WillItFit: A framework for fitting of constrained models to small-angle scattering data\", J. Appl. Cryst. 46, 1894-1898 (2013) doi:10.1107/S0021889813026022)\n") ;
+		ClearScreen( logfile ) ;
+		fprintf( logfile, "                                 Will It Fit                                    \n\n") ;
+		fprintf( logfile, "                   Fitting Macromolecules with Modifications                    \n\n") ;
+		fprintf( logfile, "                            Version 0.02 2018-04-12                             \n\n") ;
+		fprintf( logfile, "\n") ;
+		fprintf( logfile, "Based on the Will It Fit software (M.C. Pedersen, L. Arleth and K. Mortensen, \"WillItFit: A framework for fitting of constrained models to small-angle scattering data\", J. Appl. Cryst. 46, 1894-1898 (2013) doi:10.1107/S0021889813026022)\n") ;
 		fprintf( logfile, "\n") ;
 		fprintf( logfile, "Code adaptations implemented by Nicholas Skar-Gislinge, Asger Neesgaard Sand and Martin Schmiele\n") ;
 		fprintf( logfile, "\n") ;
