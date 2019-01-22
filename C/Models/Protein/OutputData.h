@@ -58,40 +58,11 @@ void OutputData(double ChiSquare, double QMin, double QMax, struct Parameter * P
 
 
 
-/*
-
-	// Print info on protein file
-
-	// Calculate Molecular Weigth
-	double Weight = 0.0 ;
-	double WeightModification = 0.0 ;
-	double VolumeModification = 0.0; 
-	for (i = 0; i < ProteinStructure.NumberOfResidues; ++i)
-	{
-		// Skip waters in calculation of molecular weight
-		if(strcmp(ProteinStructure.Residues[i].Name, "W") != 0 || strcmp(ProteinStructure.Residues[i].Name, "HOH") != 0 )
-		{
-			Weight += ProteinStructure.Residues[i].Weight ;
-		}
-		// Calculate Molecular Weight and Volume of Modification
-	 	if(strcmp(ProteinStructure.Residues[i].Name, "  X") == 0 )
-		{
-			VolumeModification +=  ProteinStructure.Residues[i].Volume ;
-			WeightModification += ProteinStructure.Residues[i].Weight ;
-		}
-	}
-	fprintf(fp, "Molecular Weight: %f\n", Weight) ;
-	fprintf(fp, "Molecular Weight of Modification (Total): %f\n", WeightModification) ;
-	fprintf(fp, "Volume of Modification (Total): %f\n", VolumeModification*(1./(1.+Parameters[8].Value))) ;
-	fprintf(fp, "Specific Volume of Modification (Total): %f\n", VolumeModification * 1e-24 *6.022e23* (1./(1.+Parameters[8].Value))/(WeightModification )) ;
-
-*/
-
 
 
 	// Print info on protein file
 
-	// scaling with HYDR (for WAT) and GLYCV (for MOD) must applied here, since the displaced volumes in the ProteinStructure are not changed (in Model() each time a copy CurrentResidue is created for the scaled version of the current residue/atom)
+	// scaling with HYDR (for WAT) and GLYCV (for MOD) must applied here, since the displaced volumes in the ProteinStructure are not changed (in Model() each time a copy CurrentAtom is created for the scaled version of the current atom)
 
 	fprintf( fp, "Atom and residue counts:\n") ;
 	fprintf( fp, "\n") ;
@@ -137,64 +108,28 @@ void OutputData(double ChiSquare, double QMin, double QMax, struct Parameter * P
 	double VolumeWithoutWater = 0.0 ;
 	double VolumeWithoutWaterAndModification = 0.0 ;
 
-	for ( int i = 0; i < ProteinStructure.NumberOfResidues; ++i)
-	{
-		Volume += ProteinStructure.Residues[i].Volume ;
-		Weight += ProteinStructure.Residues[i].Weight ;
-
-		// so far only dummy waters are scaled 
-		if( strcmp( ProteinStructure.Residues[i].Name, "WAT") == 0 )
-		{
-			VolumeWAT += ProteinStructure.Residues[i].Volume * ( 1./(1.+Parameters[HYDR].Value) ) ;
-			WeightWAT += ProteinStructure.Residues[i].Weight ;
-		}
-		if( strcmp( ProteinStructure.Residues[i].Name, "HOH") == 0 )
-		{
-			VolumeHOH += ProteinStructure.Residues[i].Volume ;
-			WeightHOH += ProteinStructure.Residues[i].Weight ;
-		}
-		// if( strcmp( ProteinStructure.Residues[i].Name, "WAT") == 0 || strcmp( ProteinStructure.Residues[i].Name, "HOH") == 0 )
-		// {
-		// 	VolumeWater += ProteinStructure.Residues[i].Volume * ( 1./(1.+Parameters[HYDR].Value) ) ;
-		//	WeightWater += ProteinStructure.Residues[i].Weight ;
-		// }
-
-	 	if( strcmp(ProteinStructure.Residues[i].Name, "  X") == 0 )
-		{
-			VolumeModification +=  ProteinStructure.Residues[i].Volume * ( 1./(1.+Parameters[GLYCV].Value) ) ;
-			WeightModification += ProteinStructure.Residues[i].Weight ;
-		}
-	}
-//NEW if ImportPDBFile has been fixed:
-/*
 	for ( int i = 0; i < ProteinStructure.NumberOfAtoms; ++i)
 	{
 		Volume += ProteinStructure.Atoms[i].Volume ;
 		Weight += ProteinStructure.Atoms[i].Weight ;
 
-		if( strcmp( ProteinStructure..Atoms[i].ResidueName, "WAT") == 0 )
+		if( strcmp( ProteinStructure.Atoms[i].ResidueName, "WAT") == 0 )
 		{
 			VolumeWAT += ProteinStructure.Atoms[i].Volume * ( 1./(1.+Parameters[HYDR].Value) ) ;
 			WeightWAT += ProteinStructure.Atoms[i].Weight ;
 		}
-		if( strcmp( ProteinStructure..Atoms[i].ResidueName, "HOH") == 0 )
+		if( strcmp( ProteinStructure.Atoms[i].ResidueName, "HOH") == 0 )
 		{
-			VolumeHOH += ProteinStructure.Atoms[i].Volume ;
+			VolumeHOH += ProteinStructure.Atoms[i].Volume * ( 1./(1.+Parameters[HYDR].Value) ) ;
 			WeightHOH += ProteinStructure.Atoms[i].Weight ;
 		}
-		// if( strcmp( ProteinStructure.Atoms[i].ResidueName, "WAT") == 0 || strcmp( ProteinStructure..Atoms[i].ResidueName, "HOH") == 0 )
-		// {
-		// 	VolumeWater += ProteinStructure.Atoms[i].Volume * ( 1./(1.+Parameters[HYDR].Value) ) ;
-		//	WeightWater += ProteinStructure.Atoms[i].Weight ;
-		// }
-
-	 	if( strcmp(ProteinStructure.Atoms[i].ResidueName, "  X") == 0 )
+	 	if( strcmp(ProteinStructure.Atoms[i].ResidueName, ProteinStructure.ModificationName) == 0 )
 		{
 			VolumeModification += ProteinStructure.Atoms[i].Volume * ( 1./(1.+Parameters[GLYCV].Value) ) ;
 			WeightModification += ProteinStructure.Atoms[i].Weight ;
 		}
 	}
-*/
+
 	WeightWater = WeightWAT + WeightHOH ;
 
 	WeightWithoutWater = Weight - WeightWater ;
@@ -262,7 +197,7 @@ void OutputData(double ChiSquare, double QMin, double QMax, struct Parameter * P
 		ComputeRg2AndCoMAndSL( &Rg2HOH, CoMHOH, &dsldHOH, &sldHOH, ProteinStructure, Parameters, Data[i].Contrast, Data[i].Constraints[SLDWater], "HOH") ;
 		ComputeRg2AndCoMAndSL( &Rg2WAT, CoMWAT, &dsldWAT, &sldWAT, ProteinStructure, Parameters, Data[i].Contrast, Data[i].Constraints[SLDWater], "WAT") ;
 		// for now Rg2Modification is unused
-		ComputeRg2AndCoMAndSL( &Rg2Modification, CoMModification, &dsldModification, &sldModification, ProteinStructure, Parameters, Data[i].Contrast, Data[i].Constraints[SLDWater], "  X") ;
+		ComputeRg2AndCoMAndSL( &Rg2Modification, CoMModification, &dsldModification, &sldModification, ProteinStructure, Parameters, Data[i].Contrast, Data[i].Constraints[SLDWater], ProteinStructure.ModificationName) ;
 
 
 		// calculate missing Rg and CoM (all in [Å])

@@ -149,7 +149,7 @@ void ComputeValueAndCovarianceMatrix(struct Dataset * Data, int NumberOfSpectra,
 // /*
 		#pragma omp parallel for schedule(dynamic) default(shared) private(q, j, k, l, DeltaChisquare, Intensity, DifferenceInIntensity, Weight, Gradient, DummyData, DummyParameters, ProteinStructureCopy, UserDefinedCopy)
 // */
-//		#pragma omp parallel for schedule(dynamic) default(none) shared(i, Data, NumberOfSpectra, HighestNumberOfDatapoints, TotalNumberOfDatapoints, NumberOfParameters, NumberOfFreeParameters, NumberOfSampleInformations, VolumesOfMolecules, NumberOfSmearingFolds, Parameters, ProteinStructure, UserDefinedStructure, DeltaForDifferentiations, AlphaMatrix, Chisquare, Beta, WriteLog, logfile) private(q, j, k, l, DeltaChisquare, Intensity, DifferenceInIntensity, Weight, Gradient, DummyData, DummyParameters)
+//		#pragma omp parallel for schedule(dynamic) default(none) shared(i, Data, NumberOfSpectra, HighestNumberOfDatapoints, TotalNumberOfDatapoints, NumberOfParameters, NumberOfFreeParameters, NumberOfSampleInformations, VolumesOfMolecules, NumberOfSmearingFolds, Parameters, ProteinStructure, UserDefinedStructure, DeltaForDifferentiations, AlphaMatrix, Chisquare, Beta, WriteLog, logfile) private(q, j, k, l, DeltaChisquare, Intensity, DifferenceInIntensity, Weight, Gradient, DummyData, DummyParameters, ProteinStructureCopy, UserDefinedCopy)
 		for (j = Data[i].NMin; j < Data[i].NMax; ++j)
 		{
 			// Initialization of copies for Data (DummyData), Parameters (DummyParameters) arrays
@@ -195,16 +195,19 @@ void ComputeValueAndCovarianceMatrix(struct Dataset * Data, int NumberOfSpectra,
 				DummyParameters[k].MaxValue   = Parameters[k].MaxValue ;
 			}
 
-/// *
+
 			// Initialization and full copy of ProteinStructure (ProteinStructureCopy)
-			if (ProteinStructure.NumberOfAtoms != 0)
+			if ( ProteinStructure.NumberOfAtoms != 0 )
 			{
 				ProteinStructureCopy.NumberOfAtoms    = ProteinStructure.NumberOfAtoms ;
 				ProteinStructureCopy.NumberOfResidues = ProteinStructure.NumberOfResidues ;
-				sprintf(ProteinStructureCopy.PDBFileLocation, "%s", ProteinStructure.PDBFileLocation) ;
+//				sprintf(ProteinStructureCopy.PDBFileLocation, "%s", ProteinStructure.PDBFileLocation) ;
 
-				AllocateProteinStructure(&ProteinStructureCopy, ProteinStructureCopy.NumberOfResidues, ProteinStructureCopy.NumberOfAtoms) ;
+				AllocateProteinStructure( &ProteinStructureCopy, ProteinStructureCopy.NumberOfResidues, ProteinStructureCopy.NumberOfAtoms) ;
 
+				CopyProteinStructure( &ProteinStructureCopy, &ProteinStructure) ; 
+
+/*
 				for (k = 0; k < ProteinStructureCopy.NumberOfResidues; ++k)
 				{
 					ProteinStructureCopy.Residues[k].xVolume = ProteinStructure.Residues[k].xVolume ;
@@ -238,8 +241,8 @@ void ComputeValueAndCovarianceMatrix(struct Dataset * Data, int NumberOfSpectra,
 					ProteinStructureCopy.Atoms[k].Volume                  = ProteinStructure.Atoms[k].Volume ;
 					ProteinStructureCopy.Atoms[k].Name                    = ProteinStructure.Atoms[k].Name ;
 				}
+*/
 			}
-//*/
 
 
 			// Computation
@@ -252,7 +255,9 @@ void ComputeValueAndCovarianceMatrix(struct Dataset * Data, int NumberOfSpectra,
 
 
 ///*
+//			Intensity = ComputeValue(q, j, i, DummyData, DummyParameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructureCopy, &UserDefinedCopy) ;
 			Intensity = ComputeValue(q, j, i, DummyData, DummyParameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &UserDefinedCopy) ;
+
 //*/
 
 			Data[i].FitValues[j] = Intensity ;
@@ -265,7 +270,7 @@ void ComputeValueAndCovarianceMatrix(struct Dataset * Data, int NumberOfSpectra,
 
 			if ( abs(WriteLog) > 1 )
 			{
-				// sheared: i, Data[i].IValues[j] ; all other are thread-private variables
+				// shared: i, Data[i].IValues[j] ; all other are thread-private variables
 				fprintf( logfile, "\t\t\t% 3d %3d  %-.4G  %-.4G  %-.4G  %-.4G  %-.4G\n", i, j, q, Data[i].IValues[j], Intensity, DifferenceInIntensity, DeltaChisquare) ;
 
 				fflush( logfile ) ;
@@ -273,9 +278,12 @@ void ComputeValueAndCovarianceMatrix(struct Dataset * Data, int NumberOfSpectra,
 
 
 			// Construct alphamatrix
+
+//			fprintf( logfile, "using WIF with shared structs\n") ;
 //			ComputeTheGradient(q, j, i, Intensity, DummyData, DummyParameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &*UserDefinedStructure, DeltaForDifferentiations, Gradient) ;
 
 // /*
+//			ComputeTheGradient(q, j, i, Intensity, DummyData, DummyParameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructureCopy, &UserDefinedCopy, DeltaForDifferentiations, Gradient) ;
 			ComputeTheGradient(q, j, i, Intensity, DummyData, DummyParameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules, ProteinStructure, &UserDefinedCopy, DeltaForDifferentiations, Gradient) ;
 // */
 

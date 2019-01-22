@@ -124,6 +124,20 @@ int Genetic(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Param
                 DummyData[j].NMin                     = Data[j].NMin;
             }
 
+
+			// Initialization and full copy of ProteinStructure (ProteinStructureCopy)
+			if ( ProteinStructure.NumberOfAtoms != 0 )
+			{
+				ProteinStructureCopy.NumberOfAtoms    = ProteinStructure.NumberOfAtoms ;
+				ProteinStructureCopy.NumberOfResidues = ProteinStructure.NumberOfResidues ;
+
+				AllocateProteinStructure( &ProteinStructureCopy, ProteinStructureCopy.NumberOfResidues, ProteinStructureCopy.NumberOfAtoms) ;
+
+				CopyProteinStructure( &ProteinStructureCopy, &ProteinStructure) ;
+			}
+
+
+/*
             if (ProteinStructure.NumberOfAtoms != 0) {
                 ProteinStructureCopy.NumberOfAtoms    = ProteinStructure.NumberOfAtoms;
                 ProteinStructureCopy.NumberOfResidues = ProteinStructure.NumberOfResidues;
@@ -163,6 +177,8 @@ int Genetic(struct Dataset * Data, int NumberOfSpectra, struct Parameter * Param
 					ProteinStructureCopy.Atoms[j].Name                    = ProteinStructure.Atoms[j].Name;
                 }
 			}
+*/
+
 
             Population[i].Chisquare = ComputeChiSquareGenetic(Data, NumberOfSpectra, DummyParameters, NumberOfParameters, NumberOfSmearingFolds, VolumesOfMolecules,
                                                               ProteinStructureCopy, &UserDefinedCopy, TotalNumberOfDatapoints, NumberOfFreeParameters);

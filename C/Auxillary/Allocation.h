@@ -51,7 +51,7 @@ void AllocateProteinStructure(struct Protein * ProteinStructure, int NumberOfRes
 
 	ProteinStructure->NumberOfModificationAtoms = 0 ;
 
-	ProteinStructure->Weight = 0 ;
+	ProteinStructure->Weight = 0.0 ;
 }
 
 /// Functions used to allocate memory for arrays

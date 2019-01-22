@@ -34,7 +34,7 @@ Atom and residue counts:
 
 	Number of Atoms                    : 10201
 	Number of Atoms (Modification UZ9) : 969
-	Number of Residues                 : 10201
+	Number of Residues                 : 944
 
 	Number of H  : 4799
 	Number of D  : 0
@@ -64,11 +64,11 @@ Molecular weights [u] and displaced volumes [A^3]:
 	Molecular weight (without WAT + HOH and UZ9) : 66636.486000
 
 	Volume                                       : 132549.570000
-	Volume (only WAT)                            : 32471.963382
+	Volume (only WAT)                            : 32471.963380
 	Volume (only HOH)                            : 0.000000
-	Volume (only WAT + HOH)                      : 32471.963382
-	Volume (only UZ9)                            : 7242.131059
-	Volume (without WAT + HOH)                   : 100077.606618
+	Volume (only WAT + HOH)                      : 32471.963380
+	Volume (only UZ9)                            : 7242.131061
+	Volume (without WAT + HOH)                   : 100077.606620
 	Volume (without WAT + HOH and UZ9)           : 92835.475559
 
 	Specific volume of UZ9 (cm^3/g)              : 0.730598

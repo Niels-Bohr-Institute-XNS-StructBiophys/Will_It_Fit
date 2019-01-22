@@ -227,11 +227,12 @@ int main(int argc, char *argv[])
 
 	if ( abs(WriteLog) > 0 )
 	{
-		fprintf( logfile, "************************** WillItFit for Novo Nordisk **************************\n\n") ;
-		fprintf( logfile, "Fitting Macromolecules with Modifications\n") ;
-		fprintf( logfile, "Version 0.01 2018-01-23\n") ;
-		fprintf( logfile, "\n\n") ;
-		fprintf( logfile, "Based on WillItFit software (M.C. Pedersen, L. Arleth and K. Mortensen, \"WillItFit: A framework for fitting of constrained models to small-angle scattering data\", J. Appl. Cryst. 46, 1894-1898 (2013) doi:10.1107/S0021889813026022)\n") ;
+		ClearScreen( logfile ) ;
+		fprintf( logfile, "                                 Will It Fit                                    \n\n") ;
+		fprintf( logfile, "                   Fitting Macromolecules with Modifications                    \n\n") ;
+		fprintf( logfile, "                            Version 0.02 2018-04-12                             \n\n") ;
+		fprintf( logfile, "\n") ;
+		fprintf( logfile, "Based on the Will It Fit software (M.C. Pedersen, L. Arleth and K. Mortensen, \"WillItFit: A framework for fitting of constrained models to small-angle scattering data\", J. Appl. Cryst. 46, 1894-1898 (2013) doi:10.1107/S0021889813026022)\n") ;
 		fprintf( logfile, "\n") ;
 		fprintf( logfile, "Code adaptations implemented by Nicholas Skar-Gislinge, Asger Neesgaard Sand and Martin Schmiele\n") ;
 		fprintf( logfile, "\n") ;
@@ -394,7 +395,6 @@ int main(int argc, char *argv[])
 		fflush( logfile ) ;
 	}
 	AssignFittingRanges( Data, QMin, QMax, NumberOfSpectra, WriteLog, logfile) ;
-
 
 
 
@@ -645,22 +645,13 @@ int main(int argc, char *argv[])
 	{
 		if ( abs(WriteLog) > 0 )
 		{
-			fprintf( logfile, "\tImport ProteinStructure.Residues via ImportResiduesFromPDBFile() from %s\n", PDBFileLocation) ;
+			fprintf( logfile, "\tImport ProteinStructure.Atoms and ProteinStructure.Residues via ImportAtomsAndResiduesFromPDBFile() from %s\n", PDBFileLocation) ;
 			fprintf( logfile, "\n") ;
 
 			fflush( logfile ) ;
 		}
-		ImportResiduesFromPDBFile( PDBFileLocation, &ProteinStructure, ResultsDirectory, WriteLog, logfile) ;
+		ImportAtomsAndResiduesFromPDBFile( PDBFileLocation, &ProteinStructure, ResultsDirectory, WriteLog, logfile) ;
 
-		// really necessary to import Atoms, too, since it has been done in residues ???
-		if ( abs(WriteLog) > 0 )
-		{
-			fprintf( logfile, "\tImportAtomsFromPDBFile()\n") ;
-			fprintf( logfile, "\n\n") ;
-
-			fflush( logfile ) ;
-		}
-		ImportAtomsFromPDBFile( PDBFileLocation, &ProteinStructure, WriteLog, logfile) ;
 
 		// write ProteinStruct to logfile
 		if ( abs(WriteLog) > 0 )
@@ -685,11 +676,46 @@ int main(int argc, char *argv[])
 			fprintf( logfile, "\t\t.ModificationName          = %s\n", ProteinStructure.ModificationName) ;
 			fprintf( logfile, "\t\t.NumberOfModificationAtoms = %d\n", ProteinStructure.NumberOfModificationAtoms) ;
 			fprintf( logfile, "\t\t.Weight                    = %lf\n", ProteinStructure.Weight) ;
+			fprintf( logfile, "\t\t.Atoms[i]\n") ;
+			fprintf( logfile, "\t\t\ti\n") ;
+			fprintf( logfile, "\t\t\t.Name\n") ;
+			fprintf( logfile, "\t\t\t.Type\n") ;
+			fprintf( logfile, "\t\t\t.ID\n") ;
+			fprintf( logfile, "\t\t\t.ResidueName\n") ;
+			fprintf( logfile, "\t\t\t.ResiudeID\n") ;
+			fprintf( logfile, "\t\t\t.Volume\n") ;
+			fprintf( logfile, "\t\t\t.Weight\n") ;
+			fprintf( logfile, "\t\t\t.XRayScatteringLength\n") ;
+			fprintf( logfile, "\t\t\t.NeutronScatteringLength\n") ;
+			fprintf( logfile, "\t\t\t.x\n") ;
+			fprintf( logfile, "\t\t\t.y\n") ;
+			fprintf( logfile, "\t\t\t.z\n") ;
+			fprintf( logfile, "\n") ;
+
+			LOWER_MAX_INDEX = 0 ; 
+			UPPER_MIN_INDEX = 0 ;
+
+			if ( abs(WriteLog) < 2 ) 
+			{
+				LOWER_MAX_INDEX = min( 7,  ProteinStructure.NumberOfAtoms) ; 
+				UPPER_MIN_INDEX = max( ProteinStructure.NumberOfAtoms - LOWER_MAX_INDEX, LOWER_MAX_INDEX) ;
+			}
+
+			for ( int i = 0; i < max( 0, LOWER_MAX_INDEX); ++i)
+			{
+				fprintf( logfile, "\t\t\t%5d %s %s %5d %s %5d %-8.3f %-8.3f %-.4G %-.4G %-8.3f %-8.3f %-8.3f\n", i, ProteinStructure.Atoms[i].Name, ProteinStructure.Atoms[i].Type, ProteinStructure.Atoms[i].ID, ProteinStructure.Atoms[i].ResidueName, ProteinStructure.Atoms[i].ResidueID, ProteinStructure.Atoms[i].Volume, ProteinStructure.Atoms[i].Weight, ProteinStructure.Atoms[i].XRayScatteringLength, ProteinStructure.Atoms[i].NeutronScatteringLength, ProteinStructure.Atoms[i].x, ProteinStructure.Atoms[i].y, ProteinStructure.Atoms[i].z) ;
+			}
+			if ( abs(WriteLog) < 2 ) { fprintf( logfile, "\n\t\t\t... (for full output use -l=2 or -l=-2 option) ...\n\n") ; }
+			for ( int i = max( 0, UPPER_MIN_INDEX); i < ProteinStructure.NumberOfAtoms; ++i)
+			{
+				fprintf( logfile, "\t\t\t%5d %s %s %5d %s %5d %-8.3f %-8.3f %-.4G %-.4G %-8.3f %-8.3f %-8.3f\n", i, ProteinStructure.Atoms[i].Name, ProteinStructure.Atoms[i].Type, ProteinStructure.Atoms[i].ID, ProteinStructure.Atoms[i].ResidueName, ProteinStructure.Atoms[i].ResidueID, ProteinStructure.Atoms[i].Volume, ProteinStructure.Atoms[i].Weight, ProteinStructure.Atoms[i].XRayScatteringLength, ProteinStructure.Atoms[i].NeutronScatteringLength, ProteinStructure.Atoms[i].x, ProteinStructure.Atoms[i].y, ProteinStructure.Atoms[i].z) ;
+			}
+			fprintf( logfile, "\n") ;
+
 			fprintf( logfile, "\t\t.Residues[i]\n") ;
 			fprintf( logfile, "\t\t\ti\n") ;
 			fprintf( logfile, "\t\t\t.Name\n") ;
-			fprintf( logfile, "\t\t\t.AtomName\n") ;
-			fprintf( logfile, "\t\t\t.ResidueID\n") ;
+			fprintf( logfile, "\t\t\t.ID\n") ;
 			fprintf( logfile, "\t\t\t.Volume\n") ;
 			fprintf( logfile, "\t\t\t.Weight\n") ;
 			fprintf( logfile, "\t\t\t.XRayScatteringLength\n") ;
@@ -716,20 +742,19 @@ int main(int argc, char *argv[])
 
 			for ( int i = 0; i < max( 0, LOWER_MAX_INDEX); ++i)
 			{
-				fprintf( logfile, "\t\t\t%5d %s %s %d %-8.3f %-8.3f %-.4G %-.4G %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f\n", i, ProteinStructure.Residues[i].Name, ProteinStructure.Residues[i].AtomName, ProteinStructure.Residues[i].ResidueID, ProteinStructure.Residues[i].Volume, ProteinStructure.Residues[i].Weight, ProteinStructure.Residues[i].XRayScatteringLength, ProteinStructure.Residues[i].NeutronScatteringLength, ProteinStructure.Residues[i].xVolume, ProteinStructure.Residues[i].yVolume, ProteinStructure.Residues[i].zVolume, ProteinStructure.Residues[i].xXRayScattering, ProteinStructure.Residues[i].yXRayScattering, ProteinStructure.Residues[i].zXRayScattering, ProteinStructure.Residues[i].xNeutronScattering, ProteinStructure.Residues[i].yNeutronScattering, ProteinStructure.Residues[i].zNeutronScattering) ;
+				fprintf( logfile, "\t\t\t%5d %s %5d %-8.3f %-8.3f %-.4G %-.4G %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f\n", i, ProteinStructure.Residues[i].Name, ProteinStructure.Residues[i].ID, ProteinStructure.Residues[i].Volume, ProteinStructure.Residues[i].Weight, ProteinStructure.Residues[i].XRayScatteringLength, ProteinStructure.Residues[i].NeutronScatteringLength, ProteinStructure.Residues[i].xVolume, ProteinStructure.Residues[i].yVolume, ProteinStructure.Residues[i].zVolume, ProteinStructure.Residues[i].xXRayScattering, ProteinStructure.Residues[i].yXRayScattering, ProteinStructure.Residues[i].zXRayScattering, ProteinStructure.Residues[i].xNeutronScattering, ProteinStructure.Residues[i].yNeutronScattering, ProteinStructure.Residues[i].zNeutronScattering) ;
 			}
 			if ( abs(WriteLog) < 2 ) { fprintf( logfile, "\n\t\t\t... (for full output use -l=2 or -l=-2 option) ...\n\n") ; }
 			for ( int i = max( 0, UPPER_MIN_INDEX); i < ProteinStructure.NumberOfResidues; ++i)
 			{
-				fprintf( logfile, "\t\t\t%5d %s %s %d %-8.3f %-8.3f %-.4G %-.4G %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f\n", i, ProteinStructure.Residues[i].Name, ProteinStructure.Residues[i].AtomName, ProteinStructure.Residues[i].ResidueID, ProteinStructure.Residues[i].Volume, ProteinStructure.Residues[i].Weight, ProteinStructure.Residues[i].XRayScatteringLength, ProteinStructure.Residues[i].NeutronScatteringLength, ProteinStructure.Residues[i].xVolume, ProteinStructure.Residues[i].yVolume, ProteinStructure.Residues[i].zVolume, ProteinStructure.Residues[i].xXRayScattering, ProteinStructure.Residues[i].yXRayScattering, ProteinStructure.Residues[i].zXRayScattering, ProteinStructure.Residues[i].xNeutronScattering, ProteinStructure.Residues[i].yNeutronScattering, ProteinStructure.Residues[i].zNeutronScattering) ;
+				fprintf( logfile, "\t\t\t%5d %s %5d %-8.3f %-8.3f %-.4G %-.4G %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f %-8.3f\n", i, ProteinStructure.Residues[i].Name, ProteinStructure.Residues[i].ID, ProteinStructure.Residues[i].Volume, ProteinStructure.Residues[i].Weight, ProteinStructure.Residues[i].XRayScatteringLength, ProteinStructure.Residues[i].NeutronScatteringLength, ProteinStructure.Residues[i].xVolume, ProteinStructure.Residues[i].yVolume, ProteinStructure.Residues[i].zVolume, ProteinStructure.Residues[i].xXRayScattering, ProteinStructure.Residues[i].yXRayScattering, ProteinStructure.Residues[i].zXRayScattering, ProteinStructure.Residues[i].xNeutronScattering, ProteinStructure.Residues[i].yNeutronScattering, ProteinStructure.Residues[i].zNeutronScattering) ;
 			}
+
 			fprintf( logfile, "\n\n") ;
 
 			fflush( logfile ) ;
 		}
 	}
-
-
 
 
 

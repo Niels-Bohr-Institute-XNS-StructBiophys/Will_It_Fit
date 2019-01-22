@@ -35,60 +35,47 @@ void ComputeRg2AndCoMAndSL( double * Rg2, double * CoM, double * dsld, double * 
 	*dsld = 0.0 ;
 	*sl = 0.0 ;
 
-	for ( int i = 0; i< ProteinStructure.NumberOfResidues; ++i)
+	for ( int i = 0; i< ProteinStructure.NumberOfAtoms; ++i)
 	{
 		// skip atoms of not matching residues, select for example only WAT, HOH or modifications
 		if ( strcmp( ResidueMatch, "") != 0 )
 		{
-			if ( strcmp( ProteinStructure.Residues[i].Name, ResidueMatch) != 0 ) { continue ; }
+			if ( strcmp( ProteinStructure.Atoms[i].ResidueName, ResidueMatch) != 0 ) { continue ; }
 		}
 
 		if ( Contrast < 0.0 )
 		{
-			x = ProteinStructure.Residues[i].xXRayScattering ;
-			y = ProteinStructure.Residues[i].yXRayScattering ;
-			z = ProteinStructure.Residues[i].zXRayScattering ;
-
-			ScatteringLength = ProteinStructure.Residues[i].XRayScatteringLength ;
+			ScatteringLength = ProteinStructure.Atoms[i].XRayScatteringLength ;
 		}
 		else
 		{
-			x = ProteinStructure.Residues[i].xNeutronScattering ;
-			y = ProteinStructure.Residues[i].yNeutronScattering ;
-			z = ProteinStructure.Residues[i].zNeutronScattering ;
+			ScatteringLength = ProteinStructure.Atoms[i].NeutronScatteringLength ; 
 
-			ScatteringLength = ProteinStructure.Residues[i].NeutronScatteringLength ; 
-
-			// note that crystal waters (residues HOH) consist of and are treated like normal atoms, i.e. O and 2*H atoms
-			// so far only dummy waters are adjusted with the right contrast 
-			if ( strcmp( ProteinStructure.Residues[i].Name, "WAT") == 0 )
+			// dummy waters (residues WAT) include scaling factor 4.133
+			if ( strcmp( ProteinStructure.Atoms[i].ResidueName, "WAT") == 0 )
 			{
 				ScatteringLength = 4.133 *( 2.0 *((Contrast* 6.671e-13 / 100.) + ((100.-Contrast)* -3.741e-13 / 100.)) + 5.803e-13) ;
 			}
-			// if ( strcmp( ProteinStructure.Residues[i].Name, "HOH") == 0 )
-			// {
-			// 	ScatteringLength = 2.0 * ((Contrast* 6.671e-13 / 100.) + ((100.-Contrast)* -3.741e-13 / 100.)) + 5.803e-13 ;
-			// }
+			// crystal waters (residues HOH) consist of and are treated like normal atoms, i.e. 2xH + 1xO atoms
+			// scale volume for both atom types, adapt NeutronScatteringLength for hydrogen according to contrast
+			if ( strcmp( ProteinStructure.Atoms[i].ResidueName, "HOH") == 0 && strcmp( ProteinStructure.Atoms[i].Type, " H") == 0 )
+			{
+				ScatteringLength = ( Contrast * 6.671e-13 + (100.-Contrast) * -3.741e-13 ) / 100. ;
+			}
 		}
+
+		x = ProteinStructure.Atoms[i].x ;
+		y = ProteinStructure.Atoms[i].y ;
+		z = ProteinStructure.Atoms[i].z ;
 
 		r2  = x * x + y * y + z * z ;
 
-		V  = ProteinStructure.Residues[i].Volume ;
+		V  = ProteinStructure.Atoms[i].Volume ;
 
-		// Scale certain volumes 
-		// so far only dummy waters are scaled
-		if ( strcmp( ProteinStructure.Residues[i].Name, "WAT") == 0 )
-		{
-			V *= ( 1./(1.+Parameters[HYDR].Value) ) ;
-		}
-		// if ( strcmp( ProteinStructure.Residues[i].Name, "WAT") == 0 || strcmp( ProteinStructure.Residues[i].Name, "HOH") == 0 )
-		// {
-		// 	V *= ( 1./(1.+Parameters[HYDR].Value) ) ;
-		// }
-		if ( strcmp( ProteinStructure.Residues[i].Name, "  X") == 0 )
-		{
-			V *= ( 1./(1.+Parameters[GLYCV].Value) ) ;
-		}
+		// Scale certain atom volumes 
+		if ( strcmp( ProteinStructure.Atoms[i].ResidueName, "WAT") == 0 ) { V *= ( 1./(1.+Parameters[HYDR].Value) ) ; }
+		if ( strcmp( ProteinStructure.Atoms[i].ResidueName, "HOH") == 0 ) { V *= ( 1./(1.+Parameters[HYDR].Value) ) ; }
+		if ( strcmp( ProteinStructure.Atoms[i].ResidueName, ProteinStructure.ModificationName) == 0 ) { V *= ( 1./(1.+Parameters[GLYCV].Value) ) ; }
 
 		*Rg2 += ( ScatteringLength / V - ScatteringLengthDensityOfSolvent ) * r2 ;
 
@@ -103,84 +90,11 @@ void ComputeRg2AndCoMAndSL( double * Rg2, double * CoM, double * dsld, double * 
 	// set those quantities affected / weighted by dsld to 0.0 
 	if ( *dsld != 0.0 ) { *Rg2 /= *dsld ; CoM[0] /= *dsld ; CoM[1] /= *dsld ; CoM[2] /= *dsld ; } else { *Rg2 = 0.0 ; CoM[0] = 0.0 ; CoM[1] = 0.0 ; CoM[2] = 0.0 ; }
 }
-//NEW if ImportPDBFile has been fixed:
-/*
-void ComputeRg2AndCoM( double Rg2, double * CoM, double dsld, struct Protein ProteinStructure, struct Parameter * Parameters, double Contrast, double ScatteringLengthDensityOfSolvent, char* ResidueMatch)
+
+
+
+void AddScatteringFromAtom( double complex **Beta, double q, struct Atom CurrentAtom, double Contrast, double ScatteringLengthDensityOfSolvent, double DeltaB)
 {
-	double x, y, z, r2, V ;
-	double ScatteringLength ;
-
-	// reset to 0.0
-	*Rg2 = 0.0 ;
-	CoM[0] = 0.0 ;
-	CoM[1] = 0.0 ;
-	CoM[2] = 0.0 ;
-	*dsld = 0.0 ;
-
-	for ( int i = 0; i< ProteinStructure.NumberOfAtoms)
-	{
-		// skip atoms of matching residues such as WAT, HOH or modifications
-		if ( strcmp( ResidueMatch, "") != 0 )
-		{
-			if ( strcmp( ProteinStructure.Atoms[i].ResidueName, ResidueMatch) != 0 ) { continue ; }
-		}
-
-		if ( Contrast < 0.0 ) 
-		{
-			ScatteringLength = ProteinStructure.Atoms[i].XRayScatteringLength ;
-		}
-		else
-		{
-			ScatteringLength = ProteinStructure.Atoms[i].NeutronScatteringLength ; 
-
-			// note that crystal waters (residues HOH) consist of and are treated like normal atoms, i.e. O and 2*H atoms
-			// so far only dummy waters are adjusted with the right contrast 
-			if ( strcmp( ProteinStructure.Atoms[i].ResidueName, "WAT") == 0 )
-			{
-				ScatteringLength = 4.133 *( 2.0 *((Contrast* 6.671e-13 / 100.) + ((100.-Contrast)* -3.741e-13 / 100.)) + 5.803e-13) ;
-			}
-			// if ( strcmp( ProteinStructure.Atoms[i].ResidueName, "HOH") == 0 )
-			// {
-			// 	ScatteringLength = 2.0 * ((Contrast* 6.671e-13 / 100.) + ((100.-Contrast)* -3.741e-13 / 100.)) + 5.803e-13 ;
-			// }
-		}
-
-		x = ProteinStructure.Atoms[i].x ;
-		y = ProteinStructure.Atoms[i].y ;
-		z = ProteinStructure.Atoms[i].z ;
-
-		r2  = x * x + y * y + z * z ;
-
-		V  = ProteinStructure.Atoms[i].Volume ;
-		// so far only dummy waters are scaled 
-		if ( strcmp( ProteinStructure.Atoms[i].ResidueName, "WAT") == 0 )
-		{
-			V *= ( 1./(1.+Parameters[HYDR].Value) ) ;
-		}
-		// if ( strcmp( ProteinStructure.Atoms[i].ResidueName, "WAT") == 0 || strcmp( ProteinStructure.Atoms[i].ResidueName, "HOH") == 0 )
-		// {
-		// 	V *= ( 1./(1.+Parameters[HYDR].Value) ) ;
-		// }
-		if ( strcmp( ProteinStructure.Atoms[i].ResidueName, "  X") == 0 )
-		{
-			V *= ( 1./(1.+Parameters[GLYCV].Value) ) ;
-		}
-
-		*Rg2 += ( ScatteringLength / V - ScatteringLengthDensityOfSolvent ) * r2 ;
-		CoM[0] += ( ScatteringLength / V - ScatteringLengthDensityOfSolvent ) * x ;
-		CoM[1]+= ( ScatteringLength / V - ScatteringLengthDensityOfSolvent ) * y ;
-		CoM[2] += ( ScatteringLength / V - ScatteringLengthDensityOfSolvent ) * z ;
-		*dsld += ( ScatteringLength / V - ScatteringLengthDensityOfSolvent ) ;
-	}
-
-	if ( *dsld != 0.0 ) { *Rg2 /= *dsld ; CoM[0] /= *dsld ; CoM[1] /= *dsld ; CoM[2] /= *dsld ; } else { 	*Rg2 = 0.0 ; CoM[0] = 0.0 ; CoM[1] = 0.0 ; CoM[2] = 0.0 ; }
-*/
-
-
-
-void AddScatteringFromResidue(double complex **Beta, double q, struct Residue CurrentResidue, double Contrast, double ScatteringLengthDensityOfSolvent, double DeltaB) {
-	// Søren Kynde, 2012 (rewritten by Martin Cramer Pedersen, 2015)
-	// This function adds the scattering of a residue to the scattering amplitude expandended by the spherical harmonic coefficients Beta_lm.
 	int l ;
 	int m ;
 
@@ -192,35 +106,27 @@ void AddScatteringFromResidue(double complex **Beta, double q, struct Residue Cu
 	double Theta ;
 	double Phi ;
 
-	double ScatteringLengthOfResidue ;
-	double ScatteringLengthOfDisplacedSolvent = CurrentResidue.Volume * ScatteringLengthDensityOfSolvent; // in case of WAT and modifications X scaling is applied to volume
+	double ScatteringLengthOfAtom ;
+	double ScatteringLengthOfDisplacedSolvent = CurrentAtom.Volume * ScatteringLengthDensityOfSolvent; // in case of water and modification (dummy) atoms scaling was applied to CurrentAtom.Volume in Model.h
 	double ExcessScatteringLength ;
 
 	if ( Contrast < 0.0 )
 	{
-		ScatteringLengthOfResidue = CurrentResidue.XRayScatteringLength ;
-		ExcessScatteringLength    = ScatteringLengthOfResidue - ScatteringLengthOfDisplacedSolvent ;
-
-		//x = CurrentResidue.xVolume ;
-		x = (CurrentResidue.xXRayScattering * ScatteringLengthOfResidue - CurrentResidue.xVolume * ScatteringLengthOfDisplacedSolvent) / ExcessScatteringLength;
-		//y = CurrentResidue.yVolume ;
-		y = (CurrentResidue.yXRayScattering * ScatteringLengthOfResidue - CurrentResidue.yVolume * ScatteringLengthOfDisplacedSolvent) / ExcessScatteringLength;
-		// z = CurrentResidue.zVolume ;
-		z = (CurrentResidue.zXRayScattering * ScatteringLengthOfResidue - CurrentResidue.zVolume * ScatteringLengthOfDisplacedSolvent) / ExcessScatteringLength;
+		ScatteringLengthOfAtom = CurrentAtom.XRayScatteringLength ;
+		ExcessScatteringLength = ScatteringLengthOfAtom - ScatteringLengthOfDisplacedSolvent ;
 	}
 	else
 	{
-		ScatteringLengthOfResidue = CurrentResidue.NeutronScatteringLength;
-		ExcessScatteringLength    = ScatteringLengthOfResidue - ScatteringLengthOfDisplacedSolvent;
-
-		//x = CurrentResidue.xVolume ; 
-		x = (CurrentResidue.xNeutronScattering * ScatteringLengthOfResidue - CurrentResidue.xVolume * ScatteringLengthOfDisplacedSolvent) / ExcessScatteringLength;
-		//y = CurrentResidue.yVolume ; 
-		y = (CurrentResidue.yNeutronScattering * ScatteringLengthOfResidue - CurrentResidue.yVolume * ScatteringLengthOfDisplacedSolvent) / ExcessScatteringLength;
-		// z = CurrentResidue.zVolume ;
-		z = (CurrentResidue.zNeutronScattering * ScatteringLengthOfResidue - CurrentResidue.zVolume * ScatteringLengthOfDisplacedSolvent) / ExcessScatteringLength;
+		ScatteringLengthOfAtom = CurrentAtom.NeutronScatteringLength;
+		ExcessScatteringLength = ScatteringLengthOfAtom - ScatteringLengthOfDisplacedSolvent;
 	}
-	//printf("%s, %0.3e, %f ,%f, %f\n",ScatteringLengthOfResidue,CurrentResidue.Name,x,y,z);
+
+	x = CurrentAtom.x ;
+	y = CurrentAtom.y ;
+	z = CurrentAtom.z ;
+
+
+	//printf( "%lf, %s %s %s, %g, %g, %g, %f ,%f, %f\n", Contrast, CurrentAtom.ResidueName, CurrentAtom.Name, CurrentAtom.Type, CurrentAtom.Volume, ScatteringLengthOfAtom, ExcessScatteringLength, x, y, z) ;
 	Radius = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2)) ;
 	Theta  = acos(z / Radius) ;
 	Phi    = acos(x / (Radius * sin(Theta))) * Sign(y) ;
@@ -321,8 +227,9 @@ void AddScatteringFromResidue(double complex **Beta, double q, struct Residue Cu
 			*/
 			LegendreIndex = gsl_sf_legendre_array_index( l, m) ;
 			//printf("l=%d m=%d LegendreIndex=%d Bessel[l]=%g Legendre[LegendreIndex]=%lf ", l, m, LegendreIndex, Bessel[l], Legendre[LegendreIndex]) ;
-			//printf("dBeta=%g\n", sqrt(DeltaB)*sqrt(4.0 * M_PI) * cpow(I, l) * ExcessScatteringLength * Bessel[l] * Legendre[LegendreIndex] * PolarComplexNumber(1.0, -m * Phi)) ;
+			//printf("dBeta=%g\n", cabs( sqrt(DeltaB)*sqrt(4.0 * M_PI) * cpow(I, l) * ExcessScatteringLength * Bessel[l] * Legendre[LegendreIndex] * PolarComplexNumber(1.0, -m * Phi)) ) ;
 			Beta[l][m] += sqrt(DeltaB)*sqrt(4.0 * M_PI) * cpow(I, l) * ExcessScatteringLength * Bessel[l] * Legendre[LegendreIndex] * PolarComplexNumber(1.0, -m * Phi) ;
+
 		}
 	}
 
@@ -330,6 +237,44 @@ void AddScatteringFromResidue(double complex **Beta, double q, struct Residue Cu
 }
 
 
+
+void CopyAtom( struct Atom * Copy, struct Atom * Original)
+{
+	Copy->Name[0]   = Original->Name[0];
+	Copy->Name[1]   = Original->Name[1];
+	Copy->Name[2]   = Original->Name[2];
+	Copy->Name[3]   = Original->Name[3];
+	Copy->Name[4]   = Original->Name[4];
+
+	Copy->Type[0]   = Original->Type[0];
+	Copy->Type[1]   = Original->Type[1];
+	Copy->Type[2]   = Original->Type[2];
+
+	Copy->ResidueName[0]   = Original->ResidueName[0];
+	Copy->ResidueName[1]   = Original->ResidueName[1];
+	Copy->ResidueName[2]   = Original->ResidueName[2];
+	Copy->ResidueName[3]   = Original->ResidueName[3];
+
+//	strcpy( Copy->Name, Original->Name) ;
+//	strcpy( Copy->Type, Original->Type) ;
+	Copy->ID = Original->ID;
+
+//	strcpy( Copy->ResidueName, Original->ResidueName) ;
+	Copy->ResidueID = Original->ResidueID;
+
+	Copy->Volume    = Original->Volume ;
+	Copy->Weight    = Original->Weight ;
+
+	Copy->XRayScatteringLength    = Original->XRayScatteringLength ;
+	Copy->NeutronScatteringLength = Original->NeutronScatteringLength ;
+
+	Copy->x = Original->x ;
+	Copy->y = Original->y ;
+	Copy->z = Original->z ;
+}
+
+
+/*
 void CopyResidue(struct Residue * Original, struct Residue * Copy)
 {
 	Copy->xVolume = Original->xVolume;
@@ -348,20 +293,20 @@ void CopyResidue(struct Residue * Original, struct Residue * Copy)
 	Copy->NeutronScatteringLength = Original->NeutronScatteringLength;
 
 	Copy->Volume    = Original->Volume;
-	Copy->Weight    = Original->Weight ; // added by MS
+	Copy->Weight    = Original->Weight ;
 
 	Copy->Name[0]   = Original->Name[0];
 	Copy->Name[1]   = Original->Name[1];
 	Copy->Name[2]   = Original->Name[2];
 	Copy->Name[3]   = Original->Name[3];
 
-	Copy->AtomName[0]   = Original->AtomName[0]; // added by MS
-	Copy->AtomName[1]   = Original->AtomName[1]; // added by MS
-	Copy->AtomName[2]   = Original->AtomName[2]; // added by MS
+	Copy->AtomName[0]   = Original->AtomName[0];
+	Copy->AtomName[1]   = Original->AtomName[1];
+	Copy->AtomName[2]   = Original->AtomName[2];
 
 	Copy->ResidueID = Original->ResidueID;
 }
-
+*/
 
 double complex pol(double r, double phi)
 {

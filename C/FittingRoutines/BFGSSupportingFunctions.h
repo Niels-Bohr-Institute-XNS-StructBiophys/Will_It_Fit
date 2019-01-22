@@ -36,6 +36,18 @@ double ComputeChiSquare(struct Dataset * Data, int NumberOfSpectra, struct Param
             InitializeUserDefinedStructure(&UserDefinedCopy);
             CopyUserDefined(&*UserDefinedStructure, &UserDefinedCopy);
 
+
+			// Initialization and full copy of ProteinStructure (ProteinStructureCopy)
+			if ( ProteinStructure.NumberOfAtoms != 0 )
+			{
+				ProteinStructureCopy.NumberOfAtoms    = ProteinStructure.NumberOfAtoms ;
+				ProteinStructureCopy.NumberOfResidues = ProteinStructure.NumberOfResidues ;
+
+				AllocateProteinStructure( &ProteinStructureCopy, ProteinStructureCopy.NumberOfResidues, ProteinStructureCopy.NumberOfAtoms) ;
+
+				CopyProteinStructure( &ProteinStructureCopy, &ProteinStructure) ;
+			}
+/*
 			if (ProteinStructure.NumberOfAtoms != 0) {
                 ProteinStructureCopy.NumberOfAtoms    = ProteinStructure.NumberOfAtoms;
                 ProteinStructureCopy.NumberOfResidues = ProteinStructure.NumberOfResidues;
@@ -75,6 +87,8 @@ double ComputeChiSquare(struct Dataset * Data, int NumberOfSpectra, struct Param
 					ProteinStructureCopy.Atoms[k].Name                    = ProteinStructure.Atoms[k].Name;
                 }
 			}
+*/
+
 
             if (Data[i].IncludeResolutionEffects == true) {
                 Intensity = 0.0;
